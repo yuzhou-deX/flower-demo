@@ -56,7 +56,7 @@ svg{display:block}
 .search .clear{color:var(--muted)}
 .coin{display:flex;align-items:center;gap:8px;height:44px;padding:0 6px 0 12px;border-radius:22px;background:var(--panel);border:1px solid var(--line);font-weight:600}
 .coin:hover{border-color:#4A3A48}
-i.c{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE59A,var(--gold) 60%,#C98A10);display:inline-block;flex:none}
+i.c{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFD5E6,var(--pink) 60%,var(--pink-2));display:inline-block;flex:none}
 .plan{padding:5px 12px;border-radius:16px;background:var(--raised);font-size:12px;font-weight:600}
 .plan.vip{background:linear-gradient(100deg,var(--pink),#FF7AB0);color:#fff}
 .icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--panel);border:1px solid var(--line)}
@@ -179,9 +179,12 @@ img.art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object
 .task .t span{color:var(--muted);font-size:12px;display:block}
 .bar{height:6px;border-radius:3px;background:var(--raised);margin-top:6px;overflow:hidden}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--peach))}
-.reward{display:flex;align-items:center;gap:4px;font-weight:700;color:var(--gold);flex:none;width:64px}
+.reward{display:flex;align-items:center;gap:4px;font-weight:700;color:var(--pink);flex:none;width:64px}
 
-/* 会员与金币 */
+/* 会员与花瓣 */
+.four{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.plancard li.off{color:var(--muted)}
+.plancard li.off svg{color:var(--muted)}
 .plancard{position:relative;display:flex;flex-direction:column;gap:10px}
 .plancard.hl{border-color:var(--pink);background:linear-gradient(180deg,#24101C,var(--card))}
 .plancard .price{font-size:30px;font-weight:800}
@@ -190,7 +193,7 @@ img.art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object
 .plancard li{display:flex;gap:8px}
 .plancard li svg{color:var(--pink);flex:none;margin-top:3px}
 .ribbon{position:absolute;top:-10px;right:16px;background:var(--pink);color:#fff;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px}
-.packs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.packs{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .pack{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;text-align:center;background:var(--raised)}
 .pack:hover{border-color:var(--pink)}
 .pack b{display:flex;align-items:center;justify-content:center;gap:6px;font-size:20px}
@@ -328,7 +331,7 @@ table.cost th{color:var(--muted);font-weight:500;font-size:12px}
   .stage{display:none}
   .roombar .title{display:block}
   .grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .two,.three,.create,.detail{grid-template-columns:1fr}
+  .two,.three,.four,.create,.detail{grid-template-columns:1fr}
   .packs{grid-template-columns:repeat(2,1fr)}
   .detail .pic{min-height:240px}
 }
@@ -344,6 +347,8 @@ table.cost th{color:var(--muted);font-weight:500;font-size:12px}
 #demoActions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 #demoActions .btn{padding:0 6px;font-size:12px;height:30px}
 #demoActions .btn:last-child{grid-column:1/-1}
+#demoTier{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--muted)}
+#demoTier select{flex:1;height:30px;border-radius:var(--r-sm);background:var(--raised);border:1px solid var(--line);padding:0 6px;font-size:12px}
 .change{display:flex;gap:7px;font-size:13px;font-style:italic;color:var(--muted);margin:4px 0}
 .change.up{color:#FF8FBF}.change span{font-size:12px;font-style:normal}.change.up span{color:var(--pink)}
 .rewardcard{display:flex;align-items:center;gap:14px;padding:14px;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md)}
@@ -443,7 +448,7 @@ body:has(#playPage:not([hidden])) .note{position:static;transform:none;text-alig
       <label class="search"><svg width="18" height="18"><use href="#i-search"/></svg>
         <input id="q" placeholder="搜索角色、世界或创作者" aria-label="搜索" oninput="onSearch(this.value)">
         <button class="clear" id="qClear" aria-label="清空搜索" onclick="onSearch('',true)" hidden><svg width="16" height="16"><use href="#i-x"/></svg></button></label>
-      <button class="coin" onclick="nav('plans')" aria-label="会员与金币"><i class="c"></i><span id="coinNum"></span><span class="plan" id="planTag"></span></button>
+      <button class="coin" onclick="nav('plans')" aria-label="会员与花瓣"><i class="c"></i><span id="coinNum"></span><span class="plan" id="planTag"></span></button>
       <button class="icon-btn" aria-label="设置" onclick="openSettings()"><svg width="20" height="20"><use href="#i-gear"/></svg></button>
       <button class="lang" onclick="langMenu(this)"><span id="langName">简体中文</span><svg width="16" height="16"><use href="#i-down"/></svg></button>
     </div>
@@ -457,7 +462,7 @@ body:has(#playPage:not([hidden])) .note{position:static;transform:none;text-alig
     <div id="stageArt"></div>
     <button class="round glass back" aria-label="返回" onclick="history.length>1?history.back():nav('home')"><svg width="20" height="20"><use href="#i-back"/></svg></button>
   </div>
-  <details class="glass" id="demoBox" open><summary>演示控制（未接判分）</summary><div id="demoActions"></div></details>
+  <details class="glass" id="demoBox" open><summary>演示控制（未接判分）</summary><div id="demoActions"></div><label id="demoTier">会员档<select aria-label="演示：切换会员档" onchange="setTier(+this.value)"></select></label></details>
   <div class="room" id="room">
     <div class="bgblur" id="blurArt"></div>
     <div class="tint"></div>
@@ -481,7 +486,6 @@ body:has(#playPage:not([hidden])) .note{position:static;transform:none;text-alig
         <button type="button" class="round" aria-label="语音" onclick="toast('语音输入会在接入语音模型后开放')"><svg width="20" height="20"><use href="#i-mic"/></svg></button>
         <button type="submit" class="send" aria-label="发送" id="sendBtn"><svg width="18" height="18"><use href="#i-send"/></svg></button>
       </form>
-      <div class="costline" id="costline"></div>
     </div></div>
 
     <aside class="drawer" id="relationDrawer" inert aria-label="你们的关系"><header><h3>你们的关系</h3><button class="round" aria-label="关闭" onclick="closeDrawer()"><svg width="18" height="18"><use href="#i-x"/></svg></button></header><div class="in" id="relationIn"></div></aside>
@@ -502,18 +506,30 @@ body:has(#playPage:not([hidden])) .note{position:static;transform:none;text-alig
 /* ================= 数据与状态 ================= */
 const ROLES = window.FLOWER_ROLES;
 const ME = 'mu_0412';
-const MODELS = {std:{name:'标准模型',cost:1,tip:'日常聊天够用，回复快'},pro:{name:'高级模型',cost:3,tip:'剧情更细、更守人设，适合长线故事'}};
+/* 会员与计价：数值全部取自 PRD V3.9 第 3 章（3.2 套餐、3.3 花瓣来源与充值、3.4 联动规则、3.5 单条价格、3.9 邀请、3.10 世界门槛） */
+const MODELS = {
+  base:{name:'基础模型',cost:2,need:0,tip:'日常聊天够用，回复快'},
+  adv:{name:'进阶模型',cost:4,need:2,tip:'剧情更细、更守人设，适合长线故事'},
+  top:{name:'旗舰模型',cost:6,need:3,tip:'最细的叙述和最稳的人设'}};
+const TIERS = [
+  {name:'免费版', price:0,     monthly:0,    quota:{},                        art:0,  saves:'20',    world:0},
+  {name:'入门会员',price:7.99, monthly:800,  quota:{base:200},                art:1,  saves:'200',   world:0},
+  {name:'标准会员',price:14.99,monthly:3000, quota:{base:200,adv:200},        art:3,  saves:'2,000', world:2},
+  {name:'畅聊会员',price:29.99,monthly:6600, quota:{base:800,adv:400,top:300},art:10, saves:'无限',  world:10}];
+const PACKS = [[800,6],[1600,10],[3600,20],[6000,30],[12000,50]];
+const SIGN_IN = 30, WORLD_TIER = 2, FACT_LIMIT = 20;
+const nf = n => n.toLocaleString('en-US');
 const S = {
-  coins:50, vip:false, checkedDays:3, checkedToday:false, lang:'简体中文',
-  favs:new Set(['source-2','nan-22']), sessions:{}, model:'std',
+  coins:50, tier:0, quota:{}, checkedDays:3, checkedToday:false, lang:'简体中文',
+  favs:new Set(['source-2','nan-22']), sessions:{}, model:'base',
   sort:'hot', gender:'all', motion:true, q:'', chip:0, tab:'role', creator:null, tagPick:null,
   rankTab:'chats', persona:{name:'mu',call:'你',bio:'刚搬到这座城市，晚上常去街角的书店。'},
   settings:{len:'适中',nsfw:false,suggest:true},
   notices:[
-    {t:'签到提醒',x:'今天的 20 金币还没领，连续签到第 7 天额外送 50。',time:'刚刚',go:'rewards',read:false},
+    {t:'签到提醒',x:'今天的 30 花瓣还没领。',time:'刚刚',go:'rewards',read:false},
     {t:'沈听澜 更新了开场',x:'你收藏的角色换了新的开场白，去看看他今天说什么。',time:'2 小时前',role:'nan-22',read:false},
     {t:'创作者 @群已权界 发布了新角色',x:'你关注的创作者有新作品。',time:'昨天',go:'home',read:false},
-    {t:'新人七日奖励',x:'连续 7 天每天发一条消息，最多可领 210 金币。',time:'3 天前',go:'rewards',read:true},
+    {t:'新手任务',x:'完成新手引导可领 30 花瓣。',time:'3 天前',go:'rewards',read:true},
   ],
   bought:0,
 };
@@ -529,7 +545,7 @@ const isFemale = r => r.tags.includes('GL');
 /* ================= 路由 ================= */
 const PAGES = {
   home:['首页','home'], recent:['最近聊天','chat'], rank:['排行榜','trophy'], memory:['我的记忆','book'],
-  rewards:['奖励','gift'], plans:['会员与金币','card'], notice:['通知','bell'], me:['个人主页','user'],
+  rewards:['奖励','gift'], plans:['会员与花瓣','card'], notice:['通知','bell'], me:['个人主页','user'],
 };
 let route = 'home', cur = '';
 function nav(p, arg){ location.hash = '#/' + p + (arg ? '/' + encodeURIComponent(arg) : ''); }
@@ -555,9 +571,9 @@ function renderShell(){
   d.className = 'daily' + (S.checkedToday?' done':'');
   d.innerHTML = S.checkedToday
     ? `<span><small>每日签到</small><strong>已连续 ${S.checkedDays} 天</strong></span><span class="amt">明天再来</span>`
-    : `<span><small>每日签到</small><strong>今天还能领</strong></span><span class="amt">+20</span>`;
-  document.getElementById('coinNum').textContent = S.coins;
-  const pt = document.getElementById('planTag'); pt.textContent = S.vip?'会员':'免费版'; pt.className = 'plan'+(S.vip?' vip':'');
+    : `<span><small>每日签到</small><strong>今天还能领</strong></span><span class="amt">+${SIGN_IN}</span>`;
+  document.getElementById('coinNum').textContent = nf(S.coins);
+  const pt = document.getElementById('planTag'); pt.textContent = TIERS[S.tier].name; pt.className = 'plan'+(S.tier?' vip':'');
   document.getElementById('meName').textContent = ME;
   document.getElementById('langName').textContent = S.lang;
 }
@@ -618,7 +634,7 @@ function paintHome(){
   const g = document.getElementById('grid');
   if(!list.length){ g.innerHTML = `<div class="empty"><strong>${q?'没有找到相关角色':'这一类还没有角色'}</strong><span>${q?'换个关键词试试，或者自己创建一个。':'换个分类看看，或者自己创建第一张。'}</span><button class="btn-create" onclick="nav('create')">创建角色</button></div>`; return; }
   const html = list.map(card);
-  if(!filtered && S.sort==='hot') html.splice(3,0,`<div class="promo"><div class="big">首充<br>5 折</div><p>会员与金币限时优惠，解锁群聊和高级模型。</p><button onclick="nav('plans')">查看优惠</button></div>`);
+  if(!filtered && S.sort==='hot') html.splice(3,0,`<div class="promo"><div class="big">带他<br>进世界</div><p>成为恋人后，标准会员可以带他去新世界。</p><button onclick="nav('plans')">看看会员</button></div>`);
   g.innerHTML = html.join('');
 }
 function resetFilters(){ S.chip=0;S.tagPick=null;S.gender='all';S.creator=null;onSearch('',true); }
@@ -818,70 +834,92 @@ function pRewards(){
   const sent = Object.values(S.sessions).reduce((a,s)=>a+s.rounds,0);
   const chatted = Object.values(S.sessions).filter(s=>s.rounds>0).length;
   const deep = Object.values(S.sessions).some(s=>s.rounds>=10);
+  S.did ||= {};
+  /* 一次性任务：PRD 3.3（新手引导 30、加入 Discord 50、关注 X 30） */
   const tasks = [
-    ['发出第一条消息','和任意角色说一句话',Math.min(sent,1),1,10,'t1'],
-    ['认识三个角色','和 3 个不同的角色聊天',Math.min(chatted,3),3,20,'t2'],
-    ['第一次长聊','和同一个角色聊满 10 轮',deep?10:Math.max(0,...Object.values(S.sessions).map(s=>s.rounds),0),10,30,'t3'],
-    ['写下一条记忆','在记忆里添加一条事实',Math.min(Object.values(S.sessions).reduce((a,s)=>a+s.facts.length,0),1),1,10,'t4'],
+    ['完成新手引导','和任意角色说第一句话',Math.min(sent,1),1,30,'t1',''],
+    ['加入 Discord','加入 Flower 的 Discord 社区',S.did.t2?1:0,1,50,'t2','去加入'],
+    ['关注 X','关注 Flower 的 X 账号',S.did.t3?1:0,1,30,'t3','去关注'],
   ];
   S.claimed ||= {};
-  return `<div class="ph"><div><h1>奖励</h1><p>签到、完成任务、邀请朋友都能拿金币。金币用来和角色聊天。</p></div><div class="coin" style="cursor:default"><i class="c"></i>${S.coins}</div></div>
-  <div class="box" style="margin-bottom:16px"><h3>每日签到<small>连续 7 天额外送 50 金币</small></h3>
+  return `<div class="ph"><div><h1>奖励</h1><p>签到、完成任务、邀请朋友都能拿花瓣。花瓣用来和角色聊天。</p></div><div class="coin" style="cursor:default"><i class="c"></i>${nf(S.coins)}</div></div>
+  <div class="box" style="margin-bottom:16px"><h3>每日签到<small>每天 ${SIGN_IN} 花瓣</small></h3>
     <div class="week">${[1,2,3,4,5,6,7].map(d=>{const got = d<=S.checkedDays, today = d===S.checkedDays+(S.checkedToday?0:1);
-      return `<div class="day ${got?'got':''} ${today?'today':''}"><small>第 ${d} 天</small><b><i class="c" style="width:14px;height:14px"></i>${d===7?70:20}</b>${got?'<small style="color:var(--pink)">已领</small>':today?'<small>今天</small>':'<small>&nbsp;</small>'}</div>`}).join('')}</div>
-    <div class="formbar"><button class="btn pri" ${S.checkedToday?'disabled':''} onclick="checkIn()">${S.checkedToday?'今天已签到':'签到领 20 金币'}</button></div></div>
+      return `<div class="day ${got?'got':''} ${today?'today':''}"><small>第 ${d} 天</small><b><i class="c" style="width:14px;height:14px"></i>${SIGN_IN}</b>${got?'<small style="color:var(--pink)">已领</small>':today?'<small>今天</small>':'<small>&nbsp;</small>'}</div>`}).join('')}</div>
+    <div class="formbar"><button class="btn pri" ${S.checkedToday?'disabled':''} onclick="checkIn()">${S.checkedToday?'今天已签到':`签到领 ${SIGN_IN} 花瓣`}</button></div></div>
   <div class="two">
-    <div class="box"><h3>新人任务<small>完成后手动领取</small></h3>
-      ${tasks.map(([t,d,p,goal,rw,k])=>{const done=p>=goal, got=S.claimed[k];
+    <div class="box"><h3>一次性任务<small>完成后手动领取</small></h3>
+      ${tasks.map(([t,d,p,goal,rw,k,go])=>{const done=p>=goal, got=S.claimed[k];
         return `<div class="task"><div class="t"><b>${t}</b><span>${d} · ${p}/${goal}</span><div class="bar"><i style="width:${p/goal*100}%"></i></div></div>
         <span class="reward"><i class="c" style="width:14px;height:14px"></i>${rw}</span>
-        <button class="btn sm ${done&&!got?'pri':''}" ${!done||got?'disabled':''} onclick="S.claimed['${k}']=1;addCoins(${rw},'任务奖励');renderPage()">${got?'已领取':done?'领取':'未完成'}</button></div>`}).join('')}
+        ${go&&!done?`<button class="btn sm" onclick="S.did['${k}']=1;toast('演示版不会真的跳转，已记为完成');renderPage()">${go}</button>`:`<button class="btn sm ${done&&!got?'pri':''}" ${!done||got?'disabled':''} onclick="S.claimed['${k}']=1;addCoins(${rw},'任务奖励');renderPage()">${got?'已领取':done?'领取':'未完成'}</button>`}</div>`}).join('')}
     </div>
-    <div class="box"><h3>邀请好友<small>双方各得 50 金币</small></h3>
-      <p class="hint">朋友通过你的链接注册，并和任意角色聊满 10 轮后，你们各得 50 金币。每月最多邀请 10 人。</p>
+    <div class="box"><h3>邀请好友<small>你得 200 花瓣，朋友得 100</small></h3>
+      <p class="hint">朋友通过你的链接注册并首次付费后，你得 200 花瓣，朋友得 100 花瓣。</p>
       <div class="field" style="margin-top:14px"><label>你的邀请链接</label><div class="addfact"><input readonly value="flower.app/i/${ME}"><button class="btn sm pri" onclick="share('flower.app/i/${ME}','邀请链接已复制')">复制</button></div></div>
-      <div class="task"><div class="t"><b>已邀请 0 人</b><span>朋友聊满 10 轮后到账</span></div></div>
+      <div class="task"><div class="t"><b>已邀请 0 人</b><span>朋友首次付费后到账</span></div></div>
     </div>
   </div>`;
 }
 function checkIn(){
   if(S.checkedToday){ toast('今天已经签到过了，明天再来'); return; }
-  S.checkedToday = true; S.checkedDays++; addCoins(20,'签到成功'); renderShell(); if(route==='rewards') renderPage();
+  S.checkedToday = true; S.checkedDays++; addCoins(SIGN_IN,'签到成功'); renderShell(); if(route==='rewards') renderPage();
 }
-function addCoins(n, why){ S.coins += n; toast(`${why}，+${n} 金币`); renderShell(); paintCost(); }
+function addCoins(n, why){ S.coins += n; toast(`${why}，+${nf(n)} 花瓣`); renderShell(); }
 
-/* ================= 会员与金币 ================= */
+/* ================= 会员与花瓣 ================= */
+function quotaText(k,q){ return `每天 ${q} 花瓣（${MODELS[k].name}约 ${q/MODELS[k].cost} 条）`; }
 function pPlans(){
-  const packs = [[60,0.99,''],[330,4.99,'+10%'],[700,9.99,'+17%'],[1500,19.99,'+25%']];
-  return `<div class="ph"><div><h1>会员与金币</h1><p>每条回复按模型扣金币，余额一直显示在输入框下方。</p></div><div class="coin" style="cursor:default"><i class="c"></i>${S.coins}<span class="plan ${S.vip?'vip':''}">${S.vip?'会员':'免费版'}</span></div></div>
-  <div class="three" style="margin-bottom:24px">
-    <div class="box plancard"><h3>免费版</h3><div class="price">$0</div>
-      <ul><li><svg width="14" height="14"><use href="#i-check"/></svg>每日签到领金币</li><li><svg width="14" height="14"><use href="#i-check"/></svg>标准模型，每条 1 金币</li><li><svg width="14" height="14"><use href="#i-check"/></svg>单角色聊天、记忆查看</li></ul>
-      <button class="btn" disabled>${S.vip?'—':'当前方案'}</button></div>
-    <div class="box plancard hl"><span class="ribbon">首月 5 折</span><h3>月度会员</h3><div class="price">$4.99 <small>首月，之后 $9.99/月</small></div>
-      <ul><li><svg width="14" height="14"><use href="#i-check"/></svg>每天赠送 100 金币</li><li><svg width="14" height="14"><use href="#i-check"/></svg>高级模型、群聊、世界卡</li><li><svg width="14" height="14"><use href="#i-check"/></svg>记忆条数上限提高到 50 条</li><li><svg width="14" height="14"><use href="#i-check"/></svg>无广告、优先排队</li></ul>
-      <button class="btn pri" ${S.vip?'disabled':''} onclick="buy('vip')">${S.vip?'已开通':'开通会员'}</button></div>
-    <div class="box plancard"><h3>年度会员</h3><div class="price">$79.99 <small>/年，约 $6.67/月</small></div>
-      <ul><li><svg width="14" height="14"><use href="#i-check"/></svg>月度会员全部权益</li><li><svg width="14" height="14"><use href="#i-check"/></svg>开通即送 1000 金币</li></ul>
-      <button class="btn" ${S.vip?'disabled':''} onclick="buy('vip',1000)">${S.vip?'已开通':'开通年度会员'}</button></div>
-  </div>
-  <div class="box" style="margin-bottom:16px"><h3>购买金币<small>金币不会过期</small></h3>
-    <div class="packs">${packs.map(([c,p,b])=>`<button class="pack" onclick="buy('coin',${c},${p})"><small>${b?'多送 '+b:'&nbsp;'}</small><b><i class="c"></i>${c}</b><span>$${p}</span></button>`).join('')}</div></div>
+  const li = (t,on=true) => `<li class="${on?'':'off'}"><svg width="14" height="14"><use href="#i-check"/></svg>${t}</li>`;
+  const planCard = (t,i) => {
+    const cur = S.tier===i;
+    const rows = i===0
+      ? [li('新账号送 50 花瓣'), li(`每日签到 ${SIGN_IN} 花瓣`), li('基础模型，每条 2 花瓣'), li(`剧情存档上限 ${t.saves}`), li('进世界、创建世界：不含',false)]
+      : [li(`每月到账 ${nf(t.monthly)} 花瓣`),
+         ...Object.entries(t.quota).map(([k,q])=>li(quotaText(k,q))),
+         li(`每日免费生图 ${t.art} 张`), li(`剧情存档上限 ${t.saves}`),
+         t.world ? li(`进世界；每月可创建 ${t.world} 个世界`) : li('进世界、创建世界：不含',false),
+         i>=2 ? li('可更换叙述模型（进阶'+(i===3?'、旗舰':'')+'）') : li('更换叙述模型：不含',false)];
+    return `<div class="box plancard ${i===2?'hl':''}">${i===2?'<span class="ribbon">推荐</span>':''}<h3>${t.name}</h3>
+      <div class="price">$${t.price}${i?' <small>/月</small>':''}</div><ul>${rows.join('')}</ul>
+      <button class="btn ${i===2&&!cur?'pri':''}" ${cur||i===0?'disabled':''} onclick="buy('tier',${i})">${cur?'当前方案':i===0?'—':'开通'+t.name}</button></div>`;
+  };
+  const q = Object.entries(S.quota);
+  return `<div class="ph"><div><h1>会员与花瓣</h1><p>花瓣用来聊天，不会过期。</p></div><div class="coin" style="cursor:default"><i class="c"></i>${nf(S.coins)}<span class="plan ${S.tier?'vip':''}">${TIERS[S.tier].name}</span></div></div>
+  <div class="four" style="margin-bottom:12px">${TIERS.map(planCard).join('')}</div>
+  <p class="hint" style="margin-bottom:24px">好感、阶段和结局不出售。阶段立绘到阶段必得。会员到期后，花瓣余额保留。</p>
+  ${q.length?`<div class="box" style="margin-bottom:16px"><h3>今天的额度<small>每天 00:00 重置，不结转；先用额度，不够的部分才扣花瓣</small></h3>
+    ${q.map(([k,v])=>`<div class="task"><div class="t"><b>${MODELS[k].name}</b><span>还剩 ${v} / ${TIERS[S.tier].quota[k]} 花瓣</span><div class="bar"><i style="width:${v/TIERS[S.tier].quota[k]*100}%"></i></div></div></div>`).join('')}</div>`:''}
+  <div class="box" style="margin-bottom:16px"><h3>购买花瓣<small>花瓣不会过期</small></h3>
+    <div class="packs">${PACKS.map(([c,p])=>`<button class="pack" onclick="buy('coin',${c},${p})"><b><i class="c"></i>${nf(c)}</b><span>$${p}</span></button>`).join('')}</div></div>
   <div class="box"><h3>每条消息花多少</h3>
-    <table class="cost"><tr><th>操作</th><th>标准模型</th><th>高级模型</th></tr>
-      <tr><td>发一条消息，角色回复</td><td>1 金币</td><td>3 金币</td></tr>
-      <tr><td>重新生成 / 续写</td><td>1 金币</td><td>3 金币</td></tr>
-      <tr><td>编辑回复、查看和修改记忆</td><td>免费</td><td>免费</td></tr></table></div>`;
+    <table class="cost"><tr><th>操作</th>${Object.values(MODELS).map(m=>`<th>${m.name}</th>`).join('')}</tr>
+      <tr><td>发一条消息，角色回复</td>${Object.values(MODELS).map(m=>`<td>${m.cost} 花瓣</td>`).join('')}</tr>
+      <tr><td>重新生成 / 续写</td>${Object.values(MODELS).map(m=>`<td>${m.cost} 花瓣</td>`).join('')}</tr>
+      <tr><td>编辑回复、查看和修改记忆</td>${Object.values(MODELS).map(()=>`<td>免费</td>`).join('')}</tr>
+      <tr><td>谁能用</td>${Object.values(MODELS).map(m=>`<td>${m.need?TIERS[m.need].name+'起':'所有人'}</td>`).join('')}</tr></table></div>`;
 }
 function buy(kind, n, price){
-  const what = kind==='vip' ? (n?'年度会员':'月度会员') : `${n} 金币（$${price}）`;
+  const what = kind==='tier' ? `${TIERS[n].name}（$${TIERS[n].price}/月）` : `${nf(n)} 花瓣（$${price}）`;
   openModal(`<div class="pad"><h2>确认购买</h2><p class="sub">${what}。演示版不会真的扣款。</p>
     <div class="formbar"><button class="btn" onclick="closeModal()">取消</button><button class="btn pri" onclick="closeModal();doBuy('${kind}',${n||0})">确认支付</button></div></div>`);
 }
+/* 换档：功能权益和当日额度按新档；grant=false 时只切档不发花瓣（演示控制用） */
+function setTier(i, grant=false){
+  S.tier = i; S.quota = {...TIERS[i].quota};
+  if(MODELS[S.model].need > i) S.model = 'base';
+  if(grant && TIERS[i].monthly) addCoins(TIERS[i].monthly, TIERS[i].name+'已开通');
+  renderShell(); paintModel(); paintTier();
+  if(document.getElementById('app').classList.contains('on')) renderPage();
+}
+function paintTier(){ const sel = document.querySelector('#demoTier select'); if(sel) sel.value = S.tier; }
 function doBuy(kind,n){
-  if(kind==='vip'){ S.vip=true; addCoins(n||100, '会员已开通'); }
-  else addCoins(n,'购买成功');
-  renderPage();
+  if(kind==='tier') setTier(n, true);
+  else { addCoins(n,'购买成功'); renderPage(); }
+}
+function needTier(i, what){
+  openModal(`<div class="pad"><h2>${what}需要${TIERS[i].name}</h2><p class="sub">${TIERS[i].name}每月 $${TIERS[i].price}。日常聊天不受影响。</p>
+    <div class="formbar"><button class="btn" onclick="closeModal()">先不用</button><button class="btn pri" onclick="closeModal();nav('plans')">看看会员</button></div></div>`);
 }
 
 /* ================= 通知 ================= */
@@ -901,7 +939,7 @@ function readNotice(i){
 function pMe(){
   const favs = ROLES.filter(r=>S.favs.has(r.id)), mine = ROLES.filter(r=>r.by===ME);
   const rounds = Object.values(S.sessions).reduce((a,s)=>a+s.rounds,0);
-  return `<div class="profile"><span class="avatar"></span><div><h1>${ME}</h1><p>${S.vip?'会员':'免费版'} · 金币 ${S.coins}</p></div>
+  return `<div class="profile"><span class="avatar"></span><div><h1>${ME}</h1><p>${TIERS[S.tier].name} · 花瓣 ${nf(S.coins)}</p></div>
     <div class="nums"><div><b>${Object.keys(S.sessions).length}</b><span>聊过的角色</span></div><div><b>${rounds}</b><span>聊天轮数</span></div><div><b>${favs.length}</b><span>收藏</span></div><div><b>${mine.length}</b><span>创建</span></div></div></div>
   <div class="two" style="margin-bottom:24px">
     <div class="box"><h3>我的玩家人设<small>角色会按这里称呼你</small></h3>
@@ -910,8 +948,8 @@ function pMe(){
       <div class="field"><label>关于你<small>角色会知道这些</small></label><textarea id="pBio" rows="3">${esc(S.persona.bio)}</textarea></div>
       <div class="formbar"><button class="btn pri" onclick="S.persona={name:pName.value.trim()||'mu',call:pCall.value.trim()||'你',bio:pBio.value.trim()};toast('人设已保存，下一条回复开始生效')">保存人设</button></div></div>
     <div class="box"><h3>账户</h3>
-      <div class="task"><div class="t"><b>方案</b><span>${S.vip?'月度会员':'免费版'}</span></div><button class="btn sm" onclick="nav('plans')">${S.vip?'管理':'升级'}</button></div>
-      <div class="task"><div class="t"><b>金币余额</b><span>${S.coins} 金币</span></div><button class="btn sm" onclick="nav('plans')">充值</button></div>
+      <div class="task"><div class="t"><b>方案</b><span>${TIERS[S.tier].name}</span></div><button class="btn sm" onclick="nav('plans')">${S.tier?'管理':'升级'}</button></div>
+      <div class="task"><div class="t"><b>花瓣余额</b><span>${nf(S.coins)} 花瓣</span></div><button class="btn sm" onclick="nav('plans')">充值</button></div>
       <div class="task"><div class="t"><b>回复长度与内容偏好</b><span>回复${S.settings.len}${S.settings.suggest?' · 显示建议回复':''}</span></div><button class="btn sm" onclick="openSettings()">设置</button></div></div>
   </div>
   <h2 style="font-size:18px;margin-bottom:12px">收藏的角色</h2>
@@ -996,8 +1034,8 @@ function showChat(id){
 }
 function paintChatFav(){ const b=document.getElementById('chatFav'), on=S.favs.has(cur); b.classList.toggle('on',on); b.setAttribute('aria-label',on?'取消收藏':'收藏'); }
 function paintModel(){ document.getElementById('modelBtn').innerHTML = `<svg width="18" height="18"><use href="#i-cpu"/></svg>${MODELS[S.model].name}<svg width="14" height="14"><use href="#i-down"/></svg>`; }
-function paintCost(){ const el=document.getElementById('costline'); if(el) el.innerHTML = `${MODELS[S.model].name} · 每条 ${MODELS[S.model].cost} 金币 · 余额 <i class="c"></i><b>${S.coins}</b>`; }
-function modelMenu(a){ openMenu(a, Object.entries(MODELS).map(([k,m])=>`<button class="${S.model===k?'cur':''}" onclick="closeMenu();S.model='${k}';paintModel();paintCost();toast('已切换到${m.name}，每条 ${m.cost} 金币')"><span><b>${m.name}</b><br><span style="color:var(--muted);font-size:12px">${m.tip}</span></span><span class="r">${m.cost} 金币/条</span></button>`).join('')); }
+function paintCost(){ /* 聊天页不显示费用（PRD 3.8、3.9）；保留空函数，原有调用不用改 */ }
+function modelMenu(a){ openMenu(a, Object.entries(MODELS).map(([k,m])=>{ const ok=S.tier>=m.need; return `<button class="${S.model===k?'cur':''}" onclick="closeMenu();${ok?`S.model='${k}';paintModel();toast('已切换到${m.name}')`:`needTier(${m.need},'${m.name}')`}"><span><b>${m.name}</b><br><span style="color:var(--muted);font-size:12px">${m.tip}</span></span><span class="r">${ok?'':TIERS[m.need].name+'起'}</span></button>`; }).join('')); }
 function chatMenu(a){
   const clear = document.getElementById('room').classList.contains('clear');
   openMenu(a, mi('角色详情',`openDetail(cur)`)+mi('我的玩家人设',`nav('me')`)+mi(clear?'背景：模糊':'背景：清晰',`document.getElementById('room').classList.toggle('clear')`)+mi('重新开始这段故事',`restart()`)+'<hr>'+mi('举报这个角色',`toast('已收到举报，我们会在 24 小时内处理')`));
@@ -1068,13 +1106,15 @@ function renderSuggest(refresh){
 }
 let busy = false;
 function charge(){
-  const c = MODELS[S.model].cost;
-  if(S.coins < c){
-    openModal(`<div class="pad"><h2>金币不够了</h2><p class="sub">${MODELS[S.model].name}每条 ${c} 金币，你还剩 ${S.coins}。</p>
-      <div class="formbar">${S.model==='pro'?`<button class="btn" onclick="closeModal();S.model='std';paintModel();paintCost()">换标准模型（1 金币/条）</button>`:''}${!S.checkedToday?`<button class="btn" onclick="closeModal();checkIn()">签到领 20</button>`:''}<button class="btn pri" onclick="closeModal();nav('plans')">去充值</button></div></div>`);
+  /* PRD 3.4 规则 1：先扣当天该模型的额度，不够的差额从花瓣扣 */
+  const c = MODELS[S.model].cost, q = S.quota[S.model] || 0, need = Math.max(0, c - q);
+  if(S.coins < need){
+    openModal(`<div class="pad"><h2>花瓣不够了</h2><p class="sub">这一条还差 ${need - S.coins} 花瓣。你写的话还留在输入框里。</p>
+      <div class="formbar"><button class="btn" onclick="closeModal();buy('coin',${PACKS[0][0]},${PACKS[0][1]})">买 ${PACKS[0][0]} 花瓣</button><button class="btn pri" onclick="closeModal();buy('tier',1)">开通入门会员</button></div></div>`);
     return false;
   }
-  S.coins -= c; renderShell(); paintCost(); return true;
+  if(q) S.quota[S.model] = q - Math.min(q, c);
+  S.coins -= need; renderShell(); return true;
 }
 function send(){
   if(busy) return;
@@ -1120,7 +1160,7 @@ function paintDrawer(){
   const r = roleById(cur), s = activeChat();
   document.getElementById('drawerIn').innerHTML = `
     <div><h4>剧情摘要<small>每 5 轮自动更新</small></h4><div class="sum">${esc(summary(r,s))}</div></div>
-    <div><h4>每轮必读的事实<small>${s.facts.length} / ${S.vip?50:20} 条</small></h4>
+    <div><h4>每轮必读的事实<small>${s.facts.length} / ${FACT_LIMIT} 条</small></h4>
       ${s.facts.map((f,i)=>`<div class="fact ${f.lock?'locked':''}"><span>${esc(f.x)}</span>
         <button class="lock ${f.lock?'on':''}" aria-label="${f.lock?'取消锁定':'锁定'}" title="锁定后角色不能推翻" onclick="activeChat().facts[${i}].lock=!activeChat().facts[${i}].lock;paintDrawer()"><svg width="16" height="16"><use href="#i-lock"/></svg></button>
         <button aria-label="删除" onclick="activeChat().facts.splice(${i},1);paintDrawer()"><svg width="16" height="16"><use href="#i-trash"/></svg></button></div>`).join('') || '<p class="hint" style="margin-bottom:8px">还没有事实。写下你希望他一直记得的事，比如“我只喝燕麦奶拿铁”。</p>'}
@@ -1130,7 +1170,7 @@ function paintDrawer(){
 }
 function addFact(){
   const i = document.getElementById('factIn'), x = i.value.trim(); if(!x){ i.focus(); return; }
-  const s = activeChat(); if(s.facts.length >= (S.vip?50:20)){ toast('事实已满，开通会员可记 50 条'); return; }
+  const s = activeChat(); if(s.facts.length >= FACT_LIMIT){ toast('事实已满，先删掉或合并几条'); return; }
   s.facts.push({x,lock:true}); paintDrawer(); toast('已记下并锁定'); setTimeout(()=>document.getElementById('factIn').focus(),0);
 }
 
@@ -1138,9 +1178,9 @@ function addFact(){
 const STAGE_LINES = [0, 25, 55, 85];
 const PLAY_DEMO = {
   stages:['初识','朋友','心动','恋人'],
-  note:'原型 v3.2 · 聊天、独白与日志均为预置演示 · 仅本次打开有效',
+  note:'原型 v3.3 · 聊天、独白与日志均为预置演示 · 仅本次打开有效',
   controls:['说对了','说错了','到下一阶段','直接成为恋人','重置'],
-  modes:[['保留关系','他还是你的恋人，记得你们的事。'],['重新认识','在这个世界里从初识开始。原来的关系留着，随时能切回。']],
+  keep:'他还是你的恋人，记得你们的事。',
   worlds:[
     ['海边小镇的夏天','住进旧邮局楼上的小房间，一起度过海风很慢的夏天。','你们刚到海边邮局，门口晾着一排明信片；挑一张吧，今天的邮船还没开。'],
     ['雾都的侦探事务所','推开黄铜门牌下的小门，一起接街坊的小委托。','你们走进蒸汽钟旁的事务所，窗台上坐着一只花猫，项圈里塞着半张取衣单。'],
@@ -1233,7 +1273,7 @@ function paintPlay(){
   [...playEl('demoActions').children].forEach((btn,i)=>btn.disabled=(i<2&&!canRate)||(i>=2&&i<=3&&stage===3));
   playEl('invite').hidden=stage!==3 || state.dismissed || !!chat.world;
   const bar=playEl('worldbar'); bar.hidden=!chat.world;
-  if(chat.world) bar.firstElementChild.textContent='世界：'+chat.world[0]+' · 关系：'+(chat.fresh?'重新认识':'保留');
+  if(chat.world) bar.firstElementChild.textContent='世界：'+chat.world[0];
   if(playEl('relationDrawer').classList.contains('on')) drawRelation();
 }
 function drawRelation(){
@@ -1270,9 +1310,11 @@ function showPlayPage(page,id){
 }
 function chooseWorld(i){
   const [name,desc,opening]=PLAY_DEMO.worlds[i];
-  openModal(`<form class="pad" onsubmit="event.preventDefault();enterWorld(${i},this.elements.mode.value==='1')"><h2>${name}</h2><p class="sub">${desc}</p><h4>开局</h4><p class="opening">${opening}</p>${PLAY_DEMO.modes.map(([title,body],j)=>`<label class="modeChoice"><input type="radio" name="mode" value="${j}" ${j===0?'checked':''}><span><b>${title}</b><small>${body}</small></span></label>`).join('')}<div class="formbar"><button class="btn pri">进入世界</button></div></form>`);
+  openModal(`<form class="pad" onsubmit="event.preventDefault();enterWorld(${i})"><h2>${name}</h2><p class="sub">${desc}</p><h4>开局</h4><p class="opening">${opening}</p><p class="hint">${PLAY_DEMO.keep}</p><div class="formbar"><button class="btn pri">进入世界</button></div></form>`);
 }
-function enterWorld(i,fresh){
+function enterWorld(i,fresh=false){
+  /* PRD 3.10：进世界要恋人阶段，且要标准档或畅聊档 */
+  if(S.tier < WORLD_TIER){ needTier(WORLD_TIER,'进世界'); return; }
   const daily=session(cur), world=PLAY_DEMO.worlds[i], origin=activeChat();
   daily.trip={world,fresh,rounds:0,updated:Date.now(),facts:fresh?[]:structuredClone(origin.facts),msgs:[{who:'scene',text:world[2]}]};
   if(!fresh){ daily.trip.relation=structuredClone(origin.relation); daily.trip.relation.value=85; }
@@ -1282,6 +1324,7 @@ function leaveWorld(){delete session(cur).trip; showChat(cur);}
 
 playEl('note').textContent=PLAY_DEMO.note;
 playEl('demoBox').open=innerWidth>900;
+document.querySelector('#demoTier select').innerHTML=TIERS.map((t,i)=>`<option value="${i}">${t.name}</option>`).join('');
 playEl('demoActions').innerHTML=PLAY_DEMO.controls.map((label,i)=>`<button class="btn" onclick="moveRelation(${i})">${label}</button>`).join('');
 /* ================= 启动 ================= */
 onRoute();
