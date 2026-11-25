@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flower · 原型 v3.2</title>
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#060507; --panel:#110E13; --card:#18141B; --raised:#231D27; --line:#2C2530;
+  --pink:#FF3E8E; --pink-2:#C21E6A; --peach:#FFB59A;
+  --text:#F6EFF3; --muted:#9C929F; --gold:#FFC857; --ok:#5FD6A4;
+  --r-lg:18px; --r-md:12px; --r-sm:8px;
+  font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,textarea,select{font:inherit;color:var(--text)}
+button:focus-visible,input:focus-visible,a:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+svg{display:block}
+.view{display:none}.view.on{display:flex}
+
+/* ---------- 外壳 ---------- */
+#app{min-height:100vh}
+.side{width:232px;flex:none;background:var(--panel);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;padding:18px 14px;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:10px;padding:2px 6px 20px;font-weight:700;font-size:20px;letter-spacing:.5px;cursor:pointer}
+.logo b{color:var(--pink)}
+.btn-create{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:var(--r-md);
+  background:linear-gradient(100deg,var(--pink),#FF7AB0);font-weight:600;color:#fff;margin-bottom:16px;
+  box-shadow:0 6px 20px -6px rgba(255,62,142,.6)}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-sm);color:var(--muted);text-decoration:none;position:relative}
+.nav a:hover{background:var(--raised);color:var(--text)}
+.nav a.cur{background:rgba(255,62,142,.12);color:var(--text)}
+.nav a.cur::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--pink)}
+.nav .badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--pink);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center}
+.nav .dot{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--pink)}
+.side-bottom{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.daily{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:var(--r-md);
+  background:linear-gradient(135deg,#2A1020,#1A1220);border:1px solid #3A1A2E;text-align:left}
+.daily small{display:block;color:var(--muted);font-size:11px}
+.daily strong{font-size:13px}
+.daily .amt{font-size:22px;font-weight:700;color:var(--pink)}
+.daily.done{background:var(--card);border-color:var(--line)}
+.daily.done .amt{color:var(--muted);font-size:14px}
+.me{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-md);border:1px solid var(--line);width:100%}
+.me:hover{background:var(--raised)}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#FF8FBF,#7B5CFF);flex:none}
+
+.main{flex:1;min-width:0;padding:16px 28px 60px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.search{flex:1;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;border-radius:22px;background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+.search input{flex:1;background:none;border:0;outline:none}
+.search .clear{color:var(--muted)}
+.coin{display:flex;align-items:center;gap:8px;height:44px;padding:0 6px 0 12px;border-radius:22px;background:var(--panel);border:1px solid var(--line);font-weight:600}
+.coin:hover{border-color:#4A3A48}
+i.c{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE59A,var(--gold) 60%,#C98A10);display:inline-block;flex:none}
+.plan{padding:5px 12px;border-radius:16px;background:var(--raised);font-size:12px;font-weight:600}
+.plan.vip{background:linear-gradient(100deg,var(--pink),#FF7AB0);color:#fff}
+.icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--panel);border:1px solid var(--line)}
+.lang{height:44px;padding:0 14px;border-radius:22px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;gap:6px}
+
+.tabs{display:flex;gap:28px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.tabs button{padding:8px 0 12px;font-size:17px;font-weight:600;color:var(--muted);position:relative}
+.tabs button.cur{color:var(--text)}
+.tabs button.cur::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--pink)}
+.tabs.sm button{font-size:15px}
+
+.filters{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.select{display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:18px;background:var(--panel);border:1px solid var(--line)}
+.select:hover{border-color:#4A3A48}
+.select.on{border-color:var(--pink);color:#FF8FBF}
+.toggle{display:flex;align-items:center;gap:8px;height:36px;padding:0 6px 0 14px;border-radius:18px;background:var(--panel);border:1px solid var(--line)}
+.sw{width:36px;height:20px;border-radius:10px;background:var(--raised);position:relative;flex:none}
+.sw.on{background:var(--pink)}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.sw.on::after{left:18px}
+.filters .spacer{flex:1}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;scrollbar-width:none}
+.chip{flex:none;display:flex;align-items:center;gap:6px;height:36px;padding:0 16px;border-radius:18px;background:var(--panel);border:1px solid var(--line);color:#D9CFD6}
+.chip:hover{border-color:#4A3A48}
+.chip.cur{background:var(--pink);border-color:var(--pink);color:#fff;font-weight:600}
+.chip.event{color:var(--pink);border-color:#5A2240;background:#1F0E18}
+.chip.event.cur{color:#fff;background:var(--pink)}
+.result{color:var(--muted);font-size:13px;margin:-6px 0 14px}
+.result button{color:var(--pink);margin-left:8px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;display:flex;flex-direction:column}
+.card{position:relative}
+.card.previewing{overflow:visible;z-index:4}
+.role-preview{position:absolute;top:-1px;bottom:-1px;display:grid;grid-template-columns:44% minmax(0,1fr);
+  border:1px solid #8a4d6c;border-radius:var(--r-lg);overflow:hidden;background:var(--card);
+  box-shadow:0 14px 42px #0009;isolation:isolate}
+.motion .role-preview{animation:preview-in .16s ease-out}
+@keyframes preview-in{from{opacity:.45;transform:scale(.985)}}
+.preview-art{width:100%;height:100%;min-height:0;object-fit:cover;object-position:center 20%}
+.preview-info{min-height:0;display:flex;flex-direction:column;gap:12px;padding:20px;background:linear-gradient(145deg,#29212b,var(--card))}
+.preview-info h3{font-size:19px;line-height:1.3;overflow-wrap:anywhere}
+.preview-copy{min-height:0;overflow:auto;flex:1;overscroll-behavior:contain;line-height:1.7;color:#dcd2d8}
+.preview-copy p+p{margin-top:10px}
+.preview-info .by{color:#ffa9ce;align-self:flex-start}
+.preview-meta{color:var(--muted);font-size:12px}
+.preview-actions{display:flex;align-items:center;gap:8px}
+.preview-actions .pri{flex:1}
+.card:hover{border-color:#5A2E48}
+.cover{position:relative;aspect-ratio:4/5;overflow:hidden}
+.cover::after{content:"";position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,rgba(24,20,27,.95))}
+img.art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%}
+.motion .card:hover img.art{transform:scale(1.06);transition:transform 3s ease-out}
+.stat{position:absolute;right:10px;bottom:10px;z-index:1;display:flex;gap:10px;font-size:12px;color:#E8DDE4}
+.stat span{display:flex;align-items:center;gap:4px}
+.stat .new{padding:2px 8px;border-radius:6px;background:var(--pink);color:#fff;font-weight:600}
+.fav{position:absolute;top:10px;right:10px;z-index:1;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+.fav.on{color:var(--pink);background:rgba(255,255,255,.9)}
+.fav.on svg path{fill:var(--pink)}
+.body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.name{font-weight:700;font-size:15px}
+.desc{color:var(--muted);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:39px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;padding:2px 8px;border-radius:6px;background:var(--raised);color:#CFC4CC}
+.tag.kind{background:rgba(255,62,142,.14);color:#FF8FBF;display:flex;align-items:center;gap:4px}
+.foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;font-size:12px;color:var(--muted)}
+.foot .by{color:var(--pink)}
+.foot .by:hover{text-decoration:underline}
+.promo{border-radius:var(--r-lg);overflow:hidden;position:relative;background:
+  radial-gradient(120% 80% at 80% 10%,#FF7AB0 0%,transparent 55%),
+  radial-gradient(90% 70% at 10% 90%,#7A1340 0%,transparent 60%),#2A0B1B;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:22px;min-height:360px;border:1px solid #5A2240}
+.promo .big{font-size:56px;font-weight:800;line-height:1;letter-spacing:-1px}
+.promo p{margin:8px 0 16px;color:#FFD5E6}
+.promo button{height:42px;border-radius:21px;background:#fff;color:var(--pink-2);font-weight:700}
+.empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:70px 0;color:var(--muted);text-align:center}
+.empty strong{color:var(--text);font-size:16px}
+.empty .btn-create{margin:12px 0 0;padding:0 22px}
+
+/* ---------- 通用页面元素 ---------- */
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:6px 0 18px}
+.ph h1{font-size:24px;font-weight:700}
+.ph p{color:var(--muted);margin-top:4px}
+.btn{height:38px;padding:0 16px;border-radius:19px;background:var(--raised);border:1px solid var(--line);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{border-color:#4A3A48}
+.btn.pri{background:var(--pink);border-color:var(--pink);color:#fff}
+.btn.pri:hover{background:#FF5A9E}
+.btn.ghost{background:none}
+.btn.sm{height:30px;padding:0 12px;font-size:12px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+.box h3{font-size:16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.box h3 small{font-weight:400;color:var(--muted);font-size:12px}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:var(--r-md);cursor:pointer}
+.row:hover{background:var(--raised)}
+.row + .row{border-top:1px solid var(--line)}
+.row:hover + .row{border-top-color:transparent}
+.thumb{width:52px;height:52px;border-radius:12px;overflow:hidden;position:relative;flex:none}
+.thumb.round{border-radius:50%;width:44px;height:44px}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-size:15px}
+.row .t span{display:block;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .meta{color:var(--muted);font-size:12px;text-align:right;flex:none}
+.rank{width:30px;text-align:center;font-weight:800;font-size:18px;color:var(--muted);flex:none}
+.rank.top{color:var(--pink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.unread{width:8px;height:8px;border-radius:50%;background:var(--pink);flex:none}
+
+/* 奖励 */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{border-radius:var(--r-md);background:var(--raised);padding:12px 6px;text-align:center;border:1px solid transparent}
+.day small{color:var(--muted);display:block;font-size:12px}
+.day b{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:6px}
+.day.got{background:rgba(255,62,142,.12);border-color:rgba(255,62,142,.4)}
+.day.today{border-color:var(--pink)}
+.task{display:flex;align-items:center;gap:14px;padding:12px 0}
+.task + .task{border-top:1px solid var(--line)}
+.task .t{flex:1}
+.task .t span{color:var(--muted);font-size:12px;display:block}
+.bar{height:6px;border-radius:3px;background:var(--raised);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--peach))}
+.reward{display:flex;align-items:center;gap:4px;font-weight:700;color:var(--gold);flex:none;width:64px}
+
+/* 会员与金币 */
+.plancard{position:relative;display:flex;flex-direction:column;gap:10px}
+.plancard.hl{border-color:var(--pink);background:linear-gradient(180deg,#24101C,var(--card))}
+.plancard .price{font-size:30px;font-weight:800}
+.plancard .price small{font-size:13px;color:var(--muted);font-weight:400}
+.plancard ul{list-style:none;display:flex;flex-direction:column;gap:6px;color:#DCD2D8;flex:1}
+.plancard li{display:flex;gap:8px}
+.plancard li svg{color:var(--pink);flex:none;margin-top:3px}
+.ribbon{position:absolute;top:-10px;right:16px;background:var(--pink);color:#fff;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px}
+.packs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.pack{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;text-align:center;background:var(--raised)}
+.pack:hover{border-color:var(--pink)}
+.pack b{display:flex;align-items:center;justify-content:center;gap:6px;font-size:20px}
+.pack small{display:block;color:var(--pink);font-size:12px;min-height:18px}
+.pack span{display:block;margin-top:8px;color:var(--muted)}
+table.cost{width:100%;border-collapse:collapse}
+table.cost td,table.cost th{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line)}
+table.cost th{color:var(--muted);font-weight:500;font-size:12px}
+
+/* 个人主页 / 表单 */
+.profile{display:flex;align-items:center;gap:18px;margin-bottom:20px}
+.profile .avatar{width:72px;height:72px}
+.profile h1{font-size:22px}
+.profile p{color:var(--muted)}
+.nums{display:flex;gap:28px;margin-left:auto}
+.nums div{text-align:center}
+.nums b{display:block;font-size:20px}
+.nums span{color:var(--muted);font-size:12px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:13px;color:#DCD2D8;font-weight:600}
+.field label small{color:var(--muted);font-weight:400;margin-left:6px}
+.field input,.field textarea,.field select{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;outline:none;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:var(--pink)}
+.field .err{color:#FF7A9C;font-size:12px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{height:32px;padding:0 14px;border-radius:16px;background:var(--raised);border:1px solid var(--line);font-size:13px}
+.seg button.cur{border-color:var(--pink);color:#FF8FBF;background:rgba(255,62,142,.1)}
+.covers{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.covers button{aspect-ratio:3/4;border-radius:10px;overflow:hidden;position:relative;border:2px solid transparent}
+.covers button.cur{border-color:var(--pink)}
+.create{display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start}
+.create .preview{position:sticky;top:16px}
+.create .preview .card{cursor:default}
+.formbar{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+
+/* ---------- 弹层 ---------- */
+.menu{position:fixed;z-index:60;min-width:180px;max-height:min(420px,70vh);overflow:auto;padding:6px;border-radius:var(--r-md);background:#1D1821;border:1px solid #3A3040;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border-radius:var(--r-sm);text-align:left}
+.menu button:hover{background:var(--raised)}
+.menu button.cur{color:#FF8FBF}
+.menu button .r{margin-left:auto;color:var(--muted);font-size:12px}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+.menu .tagpick{display:flex;flex-wrap:wrap;gap:6px;padding:6px;max-width:360px}
+.menu .tagpick button{width:auto;padding:4px 10px;border-radius:14px;background:var(--raised);font-size:12px}
+.menu .tagpick button.cur{background:var(--pink);color:#fff}
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
+.scrim.on{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:22px;width:min(560px,100%);max-height:90vh;overflow:auto;position:relative}
+.modal .x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.4);z-index:2}
+.modal .pad{padding:22px}
+.modal h2{font-size:20px;margin-bottom:6px}
+.modal .sub{color:var(--muted);margin-bottom:16px}
+.detail{display:grid;grid-template-columns:220px 1fr;width:min(760px,100%)}
+.detail .pic{position:relative;min-height:340px}
+.detail .pad h2{padding-right:40px}
+.detail .open{margin:14px 0;padding:12px 14px;border-radius:var(--r-md);background:var(--raised);color:#E6DCE2;font-size:13px;line-height:1.7}
+.detail dl{display:grid;grid-template-columns:72px 1fr;gap:6px 10px;font-size:13px;margin:12px 0}
+.detail dt{color:var(--muted)}
+.detail .acts2{display:flex;gap:10px;margin-top:16px}
+.toast{position:fixed;left:50%;top:22px;transform:translate(-50%,-20px);opacity:0;z-index:80;padding:10px 18px;border-radius:20px;background:#2A2230;border:1px solid #43384A;box-shadow:0 10px 30px rgba(0,0,0,.4);transition:.2s;pointer-events:none;display:flex;align-items:center;gap:8px}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- 聊天页 ---------- */
+#chat{height:100vh;overflow:hidden}
+.stage{flex:1;position:relative;overflow:hidden}
+.stage img.art{object-position:center 15%}
+.stage .back{position:absolute;top:18px;left:18px}
+.room{flex:1;position:relative;display:flex;flex-direction:column;overflow:hidden;overflow:clip}
+.room .bgblur{position:absolute;inset:-40px;filter:blur(36px) brightness(.35) saturate(1.2);transform:scale(1.1)}
+.room .tint{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,5,7,.55),rgba(6,5,7,.8))}
+.room.clear .bgblur{filter:brightness(.3);inset:0;transform:none}
+.room > .roombar,.room > .feed,.room > .dock{position:relative}
+.roombar{display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:18px 22px}
+.roombar .title{margin-right:auto;font-weight:700;font-size:16px;display:none}
+.glass{background:rgba(255,255,255,.08);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1)}
+.glass:hover{border-color:rgba(255,255,255,.22)}
+.pill{height:40px;padding:0 14px;border-radius:20px;display:flex;align-items:center;gap:8px;font-weight:600}
+.round{width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
+.round.on{color:var(--pink)}
+.round.on svg path{fill:var(--pink)}
+.feed{flex:1;overflow-y:auto;padding:10px 0 20px}
+.col{max-width:640px;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;gap:20px}
+.brief h4{display:flex;align-items:center;gap:8px;color:#FF8FBF;font-size:15px;margin-bottom:6px}
+.brief p{color:#E2D8DE}
+.brief .rel{margin-top:6px;color:var(--muted);font-size:13px}
+.who{display:flex;align-items:center;gap:8px;font-size:13px;color:#D9CFD6;margin-bottom:10px}
+.who .mini{width:26px;height:26px;border-radius:50%;overflow:hidden;position:relative;flex:none}
+.msg .txt p{margin:0 0 12px;color:#E6DCE2;line-height:1.75}
+.msg .txt p.say{font-weight:700;background:linear-gradient(90deg,var(--pink),var(--peach));-webkit-background-clip:text;background-clip:text;color:transparent}
+.msg .txt[contenteditable=true]{outline:1px dashed rgba(255,62,142,.6);outline-offset:6px;border-radius:4px}
+.msg .txt[contenteditable=true] p.say{color:#FF9BC2;background:none}
+.caret::after{content:"▍";color:var(--pink);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.acts{display:flex;gap:6px;opacity:.8;align-items:center}
+.acts button{height:28px;padding:0 10px;border-radius:14px;font-size:12px;display:flex;align-items:center;gap:5px}
+.acts button:hover{background:rgba(255,255,255,.1)}
+.acts .pager{margin-left:auto;color:var(--muted);font-size:12px;display:flex;align-items:center;gap:2px}
+.acts .pager button{padding:0 4px}
+.mine{align-self:flex-end;max-width:80%;padding:10px 14px;border-radius:16px 16px 4px 16px;background:rgba(255,62,142,.18);border:1px solid rgba(255,62,142,.35);white-space:pre-wrap}
+.dock{padding:0 0 18px}
+.dock .col{gap:10px}
+.suggest{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none}
+.suggest button{flex:none;width:250px;text-align:left;padding:12px 14px;border-radius:14px;font-size:13px;color:#EDE3E9;line-height:1.45}
+.suggest button:hover{border-color:rgba(255,62,142,.6)}
+.input{display:flex;align-items:center;gap:10px;height:56px;padding:0 8px 0 12px;border-radius:28px}
+.input input{flex:1;background:none;border:0;font-size:15px;outline:none}
+.input input::placeholder{color:#A99FA8}
+.send{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--pink)}
+.costline{display:flex;align-items:center;gap:6px;justify-content:center;font-size:12px;color:var(--muted)}
+.costline i.c{width:13px;height:13px}
+.costline b{color:var(--text);font-weight:600}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:min(380px,100%);z-index:5;background:rgba(17,14,19,.96);backdrop-filter:blur(20px);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.drawer header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}
+.drawer header h3{font-size:17px}
+.drawer .in{flex:1;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:18px}
+.drawer h4{font-size:13px;color:#FF8FBF;margin-bottom:8px;display:flex;justify-content:space-between}
+.drawer h4 small{color:var(--muted);font-weight:400}
+.drawer .sum{color:#DCD2D8;line-height:1.7;background:var(--raised);padding:12px;border-radius:var(--r-md)}
+.fact{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:var(--r-md);background:var(--raised);margin-bottom:8px}
+.fact span{flex:1}
+.fact button{color:var(--muted);padding:2px}
+.fact button.lock.on{color:var(--pink)}
+.fact.locked{border:1px solid rgba(255,62,142,.4)}
+.addfact{display:flex;gap:8px}
+.addfact input{flex:1;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 10px;outline:none}
+.hint{color:var(--muted);font-size:12px;line-height:1.6}
+
+.note{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;color:#6F6672;pointer-events:none;white-space:nowrap}
+
+@media (max-width:900px){
+  .side{display:none}
+  .main{padding:14px}
+  .lang,.top .icon-btn{display:none}
+  .stage{display:none}
+  .roombar .title{display:block}
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .two,.three,.create,.detail{grid-template-columns:1fr}
+  .packs{grid-template-columns:repeat(2,1fr)}
+  .detail .pic{min-height:240px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* 玩法界面沿用原型的玻璃按钮、抽屉与弹窗。 */
+#stagePill{height:32px;padding:0 12px;font-size:13px;flex:none}
+#chat .roombar .title{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
+.track{display:block;width:64px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;overflow:hidden}
+#stageFill{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--peach));transition:width 400ms}
+#demoBox{position:fixed;bottom:16px;left:16px;z-index:3;width:200px;padding:12px;border-radius:var(--r-md)}
+#demoBox:not([open]){width:auto}
+#demoBox summary{cursor:pointer;color:var(--muted);font-size:12px}
+#demoActions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+#demoActions .btn{padding:0 6px;font-size:12px;height:30px}
+#demoActions .btn:last-child{grid-column:1/-1}
+.change{display:flex;gap:7px;font-size:13px;font-style:italic;color:var(--muted);margin:4px 0}
+.change.up{color:#FF8FBF}.change span{font-size:12px;font-style:normal}.change.up span{color:var(--pink)}
+.rewardcard{display:flex;align-items:center;gap:14px;padding:14px;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md)}
+.rewardcard b{font-size:15px;font-weight:600}.rewardcard p,.sub,.textlink{color:var(--muted)}.rewardcard p,.textlink{font-size:13px}.rewardcard .btn{margin-left:auto}
+.rewardcard img,.portraits img{display:block;width:48px;height:64px;border-radius:var(--r-sm);object-fit:cover;object-position:center top}
+.rewardArt{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;object-position:center top}
+.steps,.playrow,.portraits{display:flex;align-items:center;gap:10px}
+.steps{gap:0}.steps span{position:relative;flex:1;text-align:center;color:var(--muted);font-size:13px}
+.steps span:before{content:'';display:block;width:8px;height:8px;border-radius:50%;background:currentColor;margin:5px auto}
+.steps span:not(:last-child):after{content:'';position:absolute;top:8px;left:calc(50% + 5px);width:calc(100% - 10px);height:1px;background:var(--line)}
+.steps .reached{color:var(--pink)}.steps [aria-current]{font-weight:700}
+.portraits:not(:empty){margin-top:16px}.portraits small,.opening+label small{color:var(--muted)}
+#invite,#worldbar{display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:var(--r-md);padding:8px 12px;font-size:13px}
+#invite .btn{flex:none}#worldbar{height:36px;position:relative;margin:0 22px}#invite[hidden],#worldbar[hidden]{display:none}
+#playPage{padding:48px 22px 60px}#playPage .back{position:fixed;left:18px;top:18px;z-index:1}
+.journal{max-width:680px;margin:auto}.worlds{max-width:1000px;margin:auto}
+.journalCover{width:100%;height:280px;object-fit:cover;object-position:50% 18%;border-radius:var(--r-lg);display:block}
+.journal h1{font-size:28px;margin:20px 0 4px}.moment{padding:32px 0;border-bottom:1px solid var(--line)}
+.moment .pill{height:24px;width:fit-content;font-size:12px;background:var(--raised);color:#FF8FBF}
+.narration{font-size:15px;line-height:1.75;color:#E6DCE2;margin:14px 0}
+.moment .txt,.journal footer .playrow{display:flex;flex-direction:column}.moment .txt p{margin:0}.moment .textlink{display:block;margin-top:8px}.moment:has(.mine) .textlink{margin-left:auto}
+.journal footer{text-align:center;padding-top:32px}.journal footer .btn{width:100%;height:48px}.journal footer .playrow{flex-direction:row;justify-content:center;gap:24px;margin-top:14px}
+.worlds h1{font-size:24px}.worldgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
+.worldcard{background:var(--card);border-radius:var(--r-lg);overflow:hidden;text-align:left;display:flex;flex-direction:column}
+.worldcard>b{width:100%;height:160px;display:flex;align-items:flex-end;padding:14px;font-size:18px;background:linear-gradient(135deg,var(--pink-2),var(--raised))}
+.worldcard>div{padding:14px}.worldcard small{display:inline-block;font-size:12px;padding:1px 8px;border-radius:var(--r-sm);background:var(--raised);margin:12px 0 4px}
+.worldcard span,.modeChoice small{color:var(--muted);font-size:13px}.worldcard span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.opening{color:#E6DCE2;margin:6px 0 18px;line-height:1.75}.modeChoice{display:flex;align-items:center;gap:12px;background:var(--raised);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;margin-top:8px;cursor:pointer}
+.modeChoice:has(:checked){border-color:var(--pink)}.modeChoice input{accent-color:var(--pink)}.modeChoice small{display:block}
+@media(max-width:900px){#demoBox{position:relative;bottom:auto;left:auto;align-self:flex-start;margin:2px 12px;padding:4px 10px}#chat{flex-direction:column}#chat .room{width:100%}#chat .roombar{flex-wrap:wrap;gap:5px;padding:8px}.worlds{padding-top:28px}}
+@media(max-width:600px){.worldgrid{grid-template-columns:1fr}.journal{padding-top:28px}}
+#demoActions .btn{padding:0 3px;white-space:nowrap}
+body:has(#playPage:not([hidden])) .note{position:static;transform:none;text-align:center;margin:0 auto 16px;white-space:normal}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-flower" viewBox="0 0 32 32"><g fill="#FF3E8E"><ellipse cx="16" cy="8" rx="5" ry="7"/><ellipse cx="16" cy="24" rx="5" ry="7" opacity=".75"/><ellipse cx="8" cy="16" rx="7" ry="5" opacity=".85"/><ellipse cx="24" cy="16" rx="7" ry="5" opacity=".6"/></g><circle cx="16" cy="16" r="3.5" fill="#FFB59A"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 20h8"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-2-4-6-3-5 0M12 7c2-4 6-3 5 0"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="i-group" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14a5 5 0 0 1 5 5"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 5-7 7 7 7"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/></symbol>
+    <symbol id="i-mem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 5l7 7-7 7M21 12H9a6 6 0 0 0-6 6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+    <symbol id="i-cont" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h12M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4h11l-2 4 2 4H5"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></symbol>
+  </defs>
+</svg>
+
+<!-- ================= 外壳：左栏 + 顶栏 + 页面 ================= -->
+<section id="app" class="view on">
+  <aside class="side">
+    <div class="logo" onclick="nav('home')"><svg width="30" height="30"><use href="#i-flower"/></svg><span>Flow<b>er</b></span></div>
+    <button class="btn-create" onclick="nav('create')"><svg width="18" height="18"><use href="#i-plus"/></svg>创建角色</button>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-bottom">
+      <button class="daily" id="daily" onclick="checkIn()"></button>
+      <button class="me" id="meBtn" onclick="meMenu(this)"><span class="avatar"></span><span id="meName"></span><svg width="16" height="16" style="margin-left:auto;color:var(--muted)"><use href="#i-down"/></svg></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <label class="search"><svg width="18" height="18"><use href="#i-search"/></svg>
+        <input id="q" placeholder="搜索角色、世界或创作者" aria-label="搜索" oninput="onSearch(this.value)">
+        <button class="clear" id="qClear" aria-label="清空搜索" onclick="onSearch('',true)" hidden><svg width="16" height="16"><use href="#i-x"/></svg></button></label>
+      <button class="coin" onclick="nav('plans')" aria-label="会员与金币"><i class="c"></i><span id="coinNum"></span><span class="plan" id="planTag"></span></button>
+      <button class="icon-btn" aria-label="设置" onclick="openSettings()"><svg width="20" height="20"><use href="#i-gear"/></svg></button>
+      <button class="lang" onclick="langMenu(this)"><span id="langName">简体中文</span><svg width="16" height="16"><use href="#i-down"/></svg></button>
+    </div>
+    <div id="page"></div>
+  </main>
+</section>
+
+<!-- ================= 聊天页 ================= -->
+<section id="chat" class="view">
+  <div class="stage">
+    <div id="stageArt"></div>
+    <button class="round glass back" aria-label="返回" onclick="history.length>1?history.back():nav('home')"><svg width="20" height="20"><use href="#i-back"/></svg></button>
+  </div>
+  <details class="glass" id="demoBox" open><summary>演示控制（未接判分）</summary><div id="demoActions"></div></details>
+  <div class="room" id="room">
+    <div class="bgblur" id="blurArt"></div>
+    <div class="tint"></div>
+    <div class="roombar">
+      <span class="title" id="roomTitle"></span>
+      <button class="pill glass" id="stagePill" aria-label="你们的关系" onclick="openRelation()"><span id="stageName"></span><span class="track"><i id="stageFill"></i></span></button>
+      <button class="pill glass" id="modelBtn" onclick="modelMenu(this)"></button>
+      <button class="round glass" id="chatFav" aria-label="收藏" onclick="toggleFav(cur);paintChatFav()"><svg width="18" height="18"><use href="#i-heart"/></svg></button>
+      <button class="round glass" aria-label="记忆" onclick="openDrawer()"><svg width="18" height="18"><use href="#i-mem"/></svg></button>
+      <button class="round glass" aria-label="分享" onclick="share()"><svg width="18" height="18"><use href="#i-share"/></svg></button>
+      <button class="round glass" aria-label="更多" onclick="chatMenu(this)"><svg width="18" height="18"><use href="#i-menu"/></svg></button>
+    </div>
+    <div id="worldbar" class="glass" hidden><span></span><button class="textlink" onclick="leaveWorld()">回到日常</button></div><div class="feed" id="feedWrap"><div class="col" id="feed"></div></div>
+    <div class="dock"><div class="col">
+      <div class="suggest" id="suggest"></div>
+      <div class="glass" id="invite" hidden><span>你们在一起了。想带他去别的世界看看吗？</span><button class="btn sm" onclick="openWorlds()">看看世界</button><button aria-label="关闭世界提示" onclick="relation().dismissed=true;paintPlay()">×</button></div>
+      <form class="input glass" onsubmit="event.preventDefault();send()">
+        <button type="button" class="round" aria-label="更多功能" onclick="plusMenu(this)"><svg width="20" height="20"><use href="#i-plus"/></svg></button>
+        <input id="msgInput" placeholder="说点什么，或按住说话" aria-label="输入消息" autocomplete="off">
+        <button type="button" class="round" aria-label="换一批灵感" onclick="renderSuggest(true)"><svg width="20" height="20"><use href="#i-bulb"/></svg></button>
+        <button type="button" class="round" aria-label="语音" onclick="toast('语音输入会在接入语音模型后开放')"><svg width="20" height="20"><use href="#i-mic"/></svg></button>
+        <button type="submit" class="send" aria-label="发送" id="sendBtn"><svg width="18" height="18"><use href="#i-send"/></svg></button>
+      </form>
+      <div class="costline" id="costline"></div>
+    </div></div>
+
+    <aside class="drawer" id="relationDrawer" inert aria-label="你们的关系"><header><h3>你们的关系</h3><button class="round" aria-label="关闭" onclick="closeDrawer()"><svg width="18" height="18"><use href="#i-x"/></svg></button></header><div class="in" id="relationIn"></div></aside>
+    <aside class="drawer" id="drawer" aria-label="记忆">
+      <header><h3>这段故事的记忆</h3><button class="round" aria-label="关闭" onclick="closeDrawer()"><svg width="18" height="18"><use href="#i-x"/></svg></button></header>
+      <div class="in" id="drawerIn"></div>
+    </aside>
+  </div>
+</section>
+
+<section id="playPage" hidden></section>
+<div class="scrim" id="scrim" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<div class="note" id="note"></div>
+
+<script src="roles.js"></script>
+<script>
+/* ================= 数据与状态 ================= */
+const ROLES = window.FLOWER_ROLES;
+const ME = 'mu_0412';
+const MODELS = {std:{name:'标准模型',cost:1,tip:'日常聊天够用，回复快'},pro:{name:'高级模型',cost:3,tip:'剧情更细、更守人设，适合长线故事'}};
+const S = {
+  coins:50, vip:false, checkedDays:3, checkedToday:false, lang:'简体中文',
+  favs:new Set(['source-2','nan-22']), sessions:{}, model:'std',
+  sort:'hot', gender:'all', motion:true, q:'', chip:0, tab:'role', creator:null, tagPick:null,
+  rankTab:'chats', persona:{name:'mu',call:'你',bio:'刚搬到这座城市，晚上常去街角的书店。'},
+  settings:{len:'适中',nsfw:false,suggest:true},
+  notices:[
+    {t:'签到提醒',x:'今天的 20 金币还没领，连续签到第 7 天额外送 50。',time:'刚刚',go:'rewards',read:false},
+    {t:'沈听澜 更新了开场',x:'你收藏的角色换了新的开场白，去看看他今天说什么。',time:'2 小时前',role:'nan-22',read:false},
+    {t:'创作者 @群已权界 发布了新角色',x:'你关注的创作者有新作品。',time:'昨天',go:'home',read:false},
+    {t:'新人七日奖励',x:'连续 7 天每天发一条消息，最多可领 210 金币。',time:'3 天前',go:'rewards',read:true},
+  ],
+  bought:0,
+};
+const kindIcon = {'世界':'globe','图片':'image','目标':'target','群聊':'group'};
+const num = s => !s ? 0 : String(s).includes('万') ? parseFloat(s)*1e4 : parseFloat(s);
+const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const blurb = r => (!r.desc || r.desc.length < 10 || r.desc.includes(' / ')) ? r.world : r.desc;
+const roleById = id => ROLES.find(r=>r.id===id);
+const short = n => n.replace(/（.*?）|\(.*?\)/g,'').split('｜')[0];
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isFemale = r => r.tags.includes('GL');
+
+/* ================= 路由 ================= */
+const PAGES = {
+  home:['首页','home'], recent:['最近聊天','chat'], rank:['排行榜','trophy'], memory:['我的记忆','book'],
+  rewards:['奖励','gift'], plans:['会员与金币','card'], notice:['通知','bell'], me:['个人主页','user'],
+};
+let route = 'home', cur = '';
+function nav(p, arg){ location.hash = '#/' + p + (arg ? '/' + encodeURIComponent(arg) : ''); }
+function onRoute(){
+  closePreview();
+  const [, p='home', arg] = location.hash.split('/');
+  closeMenu(); closeModal(); playEl('playPage').hidden=true;
+  if(['journal','worlds'].includes(p) && arg && roleById(decodeURIComponent(arg))){showPlayPage(p,decodeURIComponent(arg));return;}
+  if(p==='chat' && arg && roleById(decodeURIComponent(arg))){ showChat(decodeURIComponent(arg)); return; }
+  route = (PAGES[p] || p==='create') ? p : 'home';
+  document.getElementById('chat').classList.remove('on');
+  document.getElementById('app').classList.add('on');
+  renderShell(); renderPage(); scrollTo(0,0);
+}
+addEventListener('hashchange', onRoute);
+
+function renderShell(){
+  const unread = S.notices.filter(n=>!n.read).length;
+  document.getElementById('nav').innerHTML = Object.entries(PAGES).map(([k,[t,i]])=>
+    `<a href="#/${k}" class="${route===k?'cur':''}"><svg width="20" height="20"><use href="#i-${i}"/></svg>${t}${
+      k==='notice'&&unread?`<span class="badge">${unread}</span>`:k==='rewards'&&!S.checkedToday?'<span class="dot"></span>':''}</a>`).join('');
+  const d = document.getElementById('daily');
+  d.className = 'daily' + (S.checkedToday?' done':'');
+  d.innerHTML = S.checkedToday
+    ? `<span><small>每日签到</small><strong>已连续 ${S.checkedDays} 天</strong></span><span class="amt">明天再来</span>`
+    : `<span><small>每日签到</small><strong>今天还能领</strong></span><span class="amt">+20</span>`;
+  document.getElementById('coinNum').textContent = S.coins;
+  const pt = document.getElementById('planTag'); pt.textContent = S.vip?'会员':'免费版'; pt.className = 'plan'+(S.vip?' vip':'');
+  document.getElementById('meName').textContent = ME;
+  document.getElementById('langName').textContent = S.lang;
+}
+function renderPage(){
+  closePreview();
+  const el = document.getElementById('page');
+  el.innerHTML = ({home:pHome,recent:pRecent,rank:pRank,memory:pMemory,rewards:pRewards,plans:pPlans,notice:pNotice,me:pMe,create:pCreate})[route]();
+  if(route==='home') paintHome();
+  if(route==='create') paintCreatePreview();
+}
+
+/* ================= 首页 ================= */
+const tagCount = {}; ROLES.forEach(r=>r.tags.forEach(t=>tagCount[t]=(tagCount[t]||0)+1));
+const allTags = Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).map(([t])=>t);
+const topTags = allTags.filter(t=>tagCount[t]>=2).slice(0,12);
+const chips = [
+  {t:'全部',f:()=>true},
+  {t:'Flower 原创',ev:1,f:r=>r.official},
+  ...['世界','图片','目标','群聊'].map(k=>({t:k,i:kindIcon[k],f:r=>r.kinds.includes(k)})),
+  ...topTags.map(t=>({t,f:r=>r.tags.includes(t)}))
+];
+const SORTS = {hot:'近期热门',stars:'最多收藏',new:'最新上架'};
+const GENDERS = {all:'全部性别',male:'男性角色',female:'女性角色'};
+
+function pHome(){
+  return `
+  <div class="tabs" role="tablist">
+    ${[['role','角色'],['memory','记忆'],['creator','创作者']].map(([k,t])=>`<button role="tab" class="${S.tab===k?'cur':''}" onclick="S.tab='${k}';S.creator=null;renderPage()">${t}</button>`).join('')}
+  </div>
+  ${S.tab==='role' ? `
+  <div class="filters">
+    <button class="select" onclick="sortMenu(this)">${SORTS[S.sort]}<svg width="14" height="14"><use href="#i-down"/></svg></button>
+    <button class="select ${S.gender!=='all'?'on':''}" onclick="genderMenu(this)">${GENDERS[S.gender]}<svg width="14" height="14"><use href="#i-down"/></svg></button>
+    <button class="toggle" onclick="S.motion=!S.motion;renderPage()" aria-pressed="${S.motion}">动态形象<span class="sw ${S.motion?'on':''}"></span></button>
+    <span class="spacer"></span>
+    <button class="select ${S.tagPick?'on':''}" onclick="tagMenu(this)">${S.tagPick?esc(S.tagPick):'所有标签'}<svg width="14" height="14"><use href="#i-down"/></svg></button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="result" id="result"></div>
+  <div class="grid ${S.motion?'motion':''}" id="grid"></div>` : S.tab==='memory' ? memoryTab() : creatorTab()}`;
+}
+function paintHome(){
+  closePreview();
+  if(S.tab!=='role') return;
+  document.getElementById('chips').innerHTML = chips.map((c,i)=>
+    `<button class="chip ${i===S.chip?'cur':''} ${c.ev?'event':''}" onclick="S.chip=${i};S.tagPick=null;renderPage()">${c.i?`<svg width="15" height="15"><use href="#i-${c.i}"/></svg>`:''}${c.ev?'✦ ':''}${c.t}</button>`).join('');
+  const q = S.q.trim().toLowerCase();
+  let list = ROLES.filter(chips[S.chip].f)
+    .filter(r=>!S.tagPick || r.tags.includes(S.tagPick))
+    .filter(r=>S.gender==='all' || (S.gender==='female')===isFemale(r))
+    .filter(r=>!S.creator || r.by===S.creator)
+    .filter(r=>!q || [r.name,r.desc,r.by,r.world,...r.tags].join(' ').toLowerCase().includes(q));
+  const key = {hot:r=>num(r.chats), stars:r=>num(r.stars), new:r=>r.official?1e9-ROLES.indexOf(r):-ROLES.indexOf(r)}[S.sort];
+  list.sort((a,b)=>key(b)-key(a));
+  const filtered = q || S.creator || S.tagPick || S.gender!=='all' || S.chip;
+  document.getElementById('result').innerHTML = filtered
+    ? `找到 ${list.length} 个角色${S.creator?`（创作者 @${esc(S.creator)}）`:''}${q?`（搜索“${esc(S.q)}”）`:''}<button onclick="resetFilters()">清除筛选</button>` : '';
+  const g = document.getElementById('grid');
+  if(!list.length){ g.innerHTML = `<div class="empty"><strong>${q?'没有找到相关角色':'这一类还没有角色'}</strong><span>${q?'换个关键词试试，或者自己创建一个。':'换个分类看看，或者自己创建第一张。'}</span><button class="btn-create" onclick="nav('create')">创建角色</button></div>`; return; }
+  const html = list.map(card);
+  if(!filtered && S.sort==='hot') html.splice(3,0,`<div class="promo"><div class="big">首充<br>5 折</div><p>会员与金币限时优惠，解锁群聊和高级模型。</p><button onclick="nav('plans')">查看优惠</button></div>`);
+  g.innerHTML = html.join('');
+}
+function resetFilters(){ S.chip=0;S.tagPick=null;S.gender='all';S.creator=null;onSearch('',true); }
+function card(r){
+  const kinds = r.kinds.map(k=>`<span class="tag kind"><svg width="12" height="12"><use href="#i-${kindIcon[k]}"/></svg>${k}</span>`).join('');
+  const shown = r.tags.slice(0, r.kinds.length?2:3), more = r.tags.length - shown.length;
+  const fav = S.favs.has(r.id);
+  return `<article class="card" data-role-id="${esc(r.id)}" tabindex="0" onclick="openDetail('${r.id}')" onkeydown="if(event.target===this && event.key==='Enter')openDetail('${r.id}')">
+    <div class="cover"><img class="art" src="${r.cover}" alt="" loading="lazy">
+      <button class="fav ${fav?'on':''}" aria-label="${fav?'取消收藏':'收藏'}" onclick="event.stopPropagation();toggleFav('${r.id}');renderPage()"><svg width="16" height="16"><use href="#i-star"/></svg></button>
+      ${r.chats?`<div class="stat"><span><svg width="13" height="13"><use href="#i-msg"/></svg>${r.chats}</span></div>`:`<div class="stat"><span class="new">新上架</span></div>`}
+    </div>
+    <div class="body">
+      <div class="name">${esc(r.name)}</div>
+      <div class="desc">${esc(blurb(r))}</div>
+      <div class="tags">${kinds}${shown.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}${more>0?`<span class="tag">+${more}</span>`:''}</div>
+      <div class="foot"><span class="by" onclick="event.stopPropagation();byCreator('${esc(r.by)}')">@${esc(r.by)}</span>${r.stars?`<span style="display:flex;align-items:center;gap:4px"><svg width="13" height="13"><use href="#i-star"/></svg>${r.stars}</span>`:''}</div>
+    </div>
+  </article>`;
+}
+// Keep the preview inside its card so moving into the expanded area keeps it open.
+const hoverDevice = matchMedia('(any-hover: hover) and (any-pointer: fine) and (min-width: 700px)');
+let previewTimer, previewCard;
+function closePreview(){
+  clearTimeout(previewTimer);
+  if(previewCard){
+    previewCard.querySelector('.role-preview')?.remove();
+    previewCard.classList.remove('previewing');
+    previewCard = null;
+  }
+}
+function showPreview(card){
+  const r = roleById(card.dataset.roleId);
+  if(!r || !card.isConnected || !card.matches(':hover')) return;
+  const bounds = card.getBoundingClientRect(), grid = card.closest('.grid').getBoundingClientRect();
+  const width = Math.min(600, grid.width, document.documentElement.clientWidth - 16);
+  const right = Math.min(grid.right, document.documentElement.clientWidth - 8);
+  const left = Math.max(grid.left, Math.min(bounds.left + width <= right ? bounds.left : bounds.right - width, right - width));
+  const panel = document.createElement('section');
+  panel.className = 'role-preview';
+  panel.style.width = width + 'px';
+  panel.style.left = (left - bounds.left - 1) + 'px';
+  panel.setAttribute('aria-label', r.name + '的角色预览');
+  const intro = blurb(r);
+  const paragraphs = [...new Set([intro, r.world, r.personality].filter(Boolean))];
+  const saved = S.favs.has(r.id);
+  panel.innerHTML = `<img class="preview-art" src="${esc(r.cover)}" alt="">
+    <div class="preview-info"><h3>${esc(r.name)}</h3>
+    <button class="by" data-action="creator">@${esc(r.by)}</button>
+    <div class="preview-copy">${paragraphs.map(t=>`<p>${esc(t)}</p>`).join('')}</div>
+    <div class="tags">${[...r.kinds,...r.tags].slice(0,4).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+    <span class="preview-meta">${r.chats ? esc(r.chats)+' 条消息 · '+esc(r.stars || 0)+' 收藏' : '新上架'}</span>
+    <div class="preview-actions"><button class="btn" data-action="fav" aria-pressed="${saved}">${saved?'已收藏':'收藏'}</button>
+    <button class="btn pri" data-action="chat">${S.sessions[r.id]?.msgs.length>1?'继续聊天':'开始聊天'}</button></div></div>`;
+  panel.addEventListener('click', e=>{
+    const button = e.target.closest('[data-action]');
+    if(!button) return;
+    e.stopPropagation();
+    if(button.dataset.action==='fav'){
+      toggleFav(r.id);
+      const on = S.favs.has(r.id);
+      button.textContent = on?'已收藏':'收藏';
+      button.setAttribute('aria-pressed', on);
+      const star = card.querySelector('.fav');
+      star.classList.toggle('on', on);
+      star.setAttribute('aria-label', on?'取消收藏':'收藏');
+      if(route==='me') renderPage();
+      return;
+    }
+    closePreview();
+    if(button.dataset.action==='chat') nav('chat', r.id);
+    else byCreator(r.by);
+  });
+  card.classList.add('previewing');
+  card.append(panel);
+}
+document.addEventListener('pointerover', e=>{
+  const card = e.target.closest('.grid .card[data-role-id]');
+  if(e.pointerType!=='mouse' || !hoverDevice.matches || !card || card.contains(e.relatedTarget)) return;
+  closePreview();
+  previewCard = card;
+  previewTimer = setTimeout(()=>showPreview(card), 250);
+});
+document.addEventListener('pointerout', e=>{
+  if(previewCard?.contains(e.target) && !previewCard.contains(e.relatedTarget)) closePreview();
+});
+addEventListener('resize', closePreview);
+addEventListener('blur', closePreview);
+function byCreator(by){ S.tab='role';S.creator=by;S.chip=0;S.tagPick=null; route==='home'?renderPage():nav('home'); }
+function onSearch(v, clear){
+  S.q = v; const i = document.getElementById('q'); if(clear) i.value='';
+  document.getElementById('qClear').hidden = !v;
+  if(route!=='home'){ S.tab='role'; nav('home'); } else { if(S.tab!=='role'){S.tab='role';renderPage();} else paintHome(); }
+}
+function memoryTab(){
+  const list = Object.entries(S.sessions).filter(([,s])=>s.msgs.length>1);
+  if(!list.length) return `<div class="grid"><div class="empty"><strong>还没有记忆</strong><span>和角色聊上几句，他记住的事会出现在这里。你也可以随时查看和修改。</span><button class="btn-create" onclick="S.tab='role';renderPage()">去找个角色聊聊</button></div></div>`;
+  return memoryList(list);
+}
+function creatorTab(){
+  const m = {}; ROLES.forEach(r=>{ const c = m[r.by] ||= {n:0,chats:0,stars:0,cover:r.cover}; c.n++; c.chats+=num(r.chats); c.stars+=num(r.stars); });
+  const list = Object.entries(m).sort((a,b)=>b[1].chats-a[1].chats);
+  return `<div class="box"><div class="rows">${list.map(([by,c])=>`
+    <div class="row" tabindex="0" onclick="byCreator('${esc(by)}')"><span class="thumb round"><img class="art" src="${c.cover}" alt=""></span>
+      <div class="t"><b>@${esc(by)}</b><span>${c.n} 个角色${c.chats?` · 累计 ${fmt(c.chats)} 条消息`:''}</span></div>
+      <button class="btn sm" onclick="event.stopPropagation();toast('已关注 @${esc(by)}，有新角色会通知你')">关注</button></div>`).join('')}</div></div>`;
+}
+const fmt = n => n>=1e4 ? (n/1e4).toFixed(1).replace(/\.0$/,'')+'万' : String(Math.round(n));
+
+/* 下拉菜单 */
+let menuEl = null;
+function openMenu(anchor, html){
+  closeMenu(); menuEl = document.createElement('div'); menuEl.className='menu'; menuEl.innerHTML = html;
+  document.body.appendChild(menuEl);
+  const a = anchor.getBoundingClientRect(), m = menuEl.getBoundingClientRect();
+  let left = Math.min(a.left, innerWidth - m.width - 12), top = a.bottom + 6;
+  if(top + m.height > innerHeight - 8) top = Math.max(8, a.top - m.height - 6);
+  menuEl.style.left = Math.max(8,left)+'px'; menuEl.style.top = top+'px';
+  setTimeout(()=>addEventListener('click', outside), 0);
+}
+function outside(e){ if(menuEl && !menuEl.contains(e.target)) closeMenu(); }
+function closeMenu(){ if(menuEl){ menuEl.remove(); menuEl=null; removeEventListener('click', outside); } }
+const mi = (label, fn, curr, right='') => `<button class="${curr?'cur':''}" onclick="closeMenu();${fn}">${label}${curr?'<svg width="14" height="14" style="margin-left:auto"><use href="#i-check"/></svg>':right?`<span class="r">${right}</span>`:''}</button>`;
+function sortMenu(a){ openMenu(a, Object.entries(SORTS).map(([k,t])=>mi(t,`S.sort='${k}';renderPage()`,S.sort===k)).join('')); }
+function genderMenu(a){ openMenu(a, Object.entries(GENDERS).map(([k,t])=>mi(t,`S.gender='${k}';renderPage()`,S.gender===k)).join('')); }
+function tagMenu(a){
+  openMenu(a, `<div class="tagpick">${['所有标签',...allTags].map(t=>`<button class="${(S.tagPick||'所有标签')===t?'cur':''}" onclick="closeMenu();S.tagPick=${t==='所有标签'?'null':`'${esc(t)}'`};S.chip=0;renderPage()">${esc(t)}${t!=='所有标签'?` ${tagCount[t]}`:''}</button>`).join('')}</div>`);
+}
+function langMenu(a){ openMenu(a, ['简体中文','繁體中文','English'].map(l=>mi(l, l==='简体中文'?`S.lang='${l}';renderShell()`:`toast('${l} 界面会在多语言版本开放')`, S.lang===l)).join('')); }
+function meMenu(a){ openMenu(a, mi('个人主页',"nav('me')")+mi('我的角色',"nav('me');setTimeout(()=>document.getElementById('mine')?.scrollIntoView(),50)")+mi('设置','openSettings()')+'<hr>'+mi('退出登录',"toast('演示版不需要登录')")); }
+
+/* ================= 角色详情 ================= */
+function openDetail(id){
+  closePreview();
+  const r = roleById(id), fav = S.favs.has(id), s = S.sessions[id];
+  openModal(`<div class="detail">
+    <div class="pic"><img class="art" src="${r.cover}" alt="${esc(r.name)}"></div>
+    <div class="pad">
+      <h2>${esc(r.name)}</h2>
+      <div class="sub"><span class="by" style="color:var(--pink);cursor:pointer" onclick="closeModal();byCreator('${esc(r.by)}')">@${esc(r.by)}</span>${r.chats?` · ${r.chats} 条消息 · ${r.stars} 收藏`:' · 新上架'}</div>
+      <div class="tags">${r.kinds.map(k=>`<span class="tag kind"><svg width="12" height="12"><use href="#i-${kindIcon[k]}"/></svg>${k}</span>`).join('')}${r.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <p style="margin-top:12px;color:#DCD2D8">${esc(blurb(r))}</p>
+      <dl><dt>世界</dt><dd>${esc(r.world)}</dd><dt>关系</dt><dd>${esc(r.relationship)}</dd><dt>性格</dt><dd>${esc(r.personality)}</dd><dt>玩法</dt><dd>${esc(r.playMode||'自由聊天')}${r.category?` · ${esc(r.category)}`:''}</dd></dl>
+      <div class="open"><b style="color:#FF8FBF">开场</b><br>${esc(r.greeting)}</div>
+      <div class="acts2">
+        <button class="btn pri" style="flex:1" onclick="closeModal();nav('chat','${id}')">${s&&s.msgs.length>1?'继续上次的故事':'开始聊天'}</button>
+        <button class="btn" onclick="toggleFav('${id}');openDetail('${id}');${route==='home'?'paintHome()':''}"><svg width="16" height="16"><use href="#i-star"/></svg>${fav?'已收藏':'收藏'}</button>
+      </div>
+    </div></div>`, true);
+}
+function toggleFav(id){ S.favs.has(id)?S.favs.delete(id):S.favs.add(id); toast(S.favs.has(id)?'已收藏，可在个人主页找到':'已取消收藏'); }
+
+/* ================= 最近聊天 ================= */
+function pRecent(){
+  const list = Object.entries(S.sessions).filter(([,s])=>s.msgs.length).sort((a,b)=>b[1].updated-a[1].updated);
+  return `<div class="ph"><div><h1>最近聊天</h1><p>从上次停下的地方接着聊。</p></div></div>
+  ${list.length ? `<div class="box"><div class="rows">${list.map(([id,s])=>{const r=roleById(id), last=lastLine(s);
+    return `<div class="row" tabindex="0" onclick="nav('chat','${id}')"><span class="thumb round"><img class="art" src="${r.cover}" alt=""></span>
+      <div class="t"><b>${esc(r.name)}</b><span>${esc(last)}</span></div>
+      <div class="meta">${ago(s.updated)}<br>${s.rounds} 轮</div>
+      <button class="btn sm ghost" aria-label="删除对话" onclick="event.stopPropagation();delete S.sessions['${id}'];renderPage();toast('已删除这段对话')"><svg width="14" height="14"><use href="#i-trash"/></svg></button></div>`}).join('')}</div></div>`
+  : `<div class="grid"><div class="empty"><strong>还没有聊过天</strong><span>在首页挑一个角色，第一句话他会先开口。</span><button class="btn-create" onclick="nav('home')">去首页看看</button></div></div>`}`;
+}
+function lastLine(s){ const m = s.msgs[s.msgs.length-1]; return m.who==='me' ? '你：'+m.text : m.versions[m.v].map(p=>p.x).join(''); }
+function ago(t){ const d=(Date.now()-t)/1000; return d<60?'刚刚':d<3600?Math.floor(d/60)+' 分钟前':Math.floor(d/3600)+' 小时前'; }
+
+/* ================= 排行榜 ================= */
+function pRank(){
+  const tabs = {chats:['热聊榜','按累计消息数'],stars:['收藏榜','按收藏数'],new:['新星榜','近期上架的 Flower 原创']};
+  let list = S.rankTab==='new' ? ROLES.filter(r=>r.official).slice(0,20) : [...ROLES].filter(r=>r[S.rankTab]).sort((a,b)=>num(b[S.rankTab])-num(a[S.rankTab])).slice(0,20);
+  return `<div class="ph"><div><h1>排行榜</h1><p>${tabs[S.rankTab][1]}，每天更新。</p></div></div>
+  <div class="tabs sm">${Object.entries(tabs).map(([k,[t]])=>`<button class="${S.rankTab===k?'cur':''}" onclick="S.rankTab='${k}';renderPage()">${t}</button>`).join('')}</div>
+  <div class="box"><div class="rows">${list.map((r,i)=>`
+    <div class="row" tabindex="0" onclick="openDetail('${r.id}')"><span class="rank ${i<3?'top':''}">${i+1}</span>
+      <span class="thumb"><img class="art" src="${r.cover}" alt=""></span>
+      <div class="t"><b>${esc(r.name)}</b><span>${esc(blurb(r))}</span></div>
+      <div class="meta">${S.rankTab==='new'?'新上架':S.rankTab==='chats'?r.chats+' 条消息':r.stars+' 收藏'}<br><span style="color:var(--pink)">@${esc(r.by)}</span></div></div>`).join('')}</div></div>`;
+}
+
+/* ================= 我的记忆 ================= */
+function pMemory(){
+  const list = Object.entries(S.sessions).filter(([,s])=>s.msgs.length>1);
+  return `<div class="ph"><div><h1>我的记忆</h1><p>角色记住的事都在这里。锁定的事实，角色不能推翻。</p></div></div>
+  ${list.length ? memoryList(list) : `<div class="grid"><div class="empty"><strong>还没有记忆</strong><span>和角色聊上几句，他记住的事会出现在这里。</span><button class="btn-create" onclick="nav('home')">去找个角色聊聊</button></div></div>`}`;
+}
+function memoryList(list){
+  return `<div class="two">${list.map(([id,s])=>{const r=roleById(id);
+    return `<div class="box"><h3><span style="display:flex;align-items:center;gap:10px"><span class="thumb round" style="width:32px;height:32px"><img class="art" src="${r.cover}" alt=""></span>${esc(r.name)}</span><small>${s.rounds} 轮 · ${ago(s.updated)}</small></h3>
+      <p class="hint" style="margin-bottom:10px">${esc(summary(r,s))}</p>
+      ${s.facts.length?s.facts.map(f=>`<div class="fact ${f.lock?'locked':''}"><span>${esc(f.x)}</span>${f.lock?'<svg width="14" height="14" style="color:var(--pink)"><use href="#i-lock"/></svg>':''}</div>`).join(''):'<p class="hint">还没有记下的事实。聊天时点右上角的书签可以添加。</p>'}
+      <div class="formbar"><button class="btn sm" onclick="nav('chat','${id}');setTimeout(openDrawer,80)">查看和修改</button><button class="btn sm pri" onclick="nav('chat','${id}')">继续聊</button></div></div>`}).join('')}</div>`;
+}
+function summary(r,s){ return `你和${short(r.name)}的故事从这里开始：${r.world}关系是${r.relationship}。已经聊了 ${s.rounds} 轮${s.rounds>=3?'，彼此熟悉了一些':''}。`; }
+
+/* ================= 奖励 ================= */
+function pRewards(){
+  const sent = Object.values(S.sessions).reduce((a,s)=>a+s.rounds,0);
+  const chatted = Object.values(S.sessions).filter(s=>s.rounds>0).length;
+  const deep = Object.values(S.sessions).some(s=>s.rounds>=10);
+  const tasks = [
+    ['发出第一条消息','和任意角色说一句话',Math.min(sent,1),1,10,'t1'],
+    ['认识三个角色','和 3 个不同的角色聊天',Math.min(chatted,3),3,20,'t2'],
+    ['第一次长聊','和同一个角色聊满 10 轮',deep?10:Math.max(0,...Object.values(S.sessions).map(s=>s.rounds),0),10,30,'t3'],
+    ['写下一条记忆','在记忆里添加一条事实',Math.min(Object.values(S.sessions).reduce((a,s)=>a+s.facts.length,0),1),1,10,'t4'],
+  ];
+  S.claimed ||= {};
+  return `<div class="ph"><div><h1>奖励</h1><p>签到、完成任务、邀请朋友都能拿金币。金币用来和角色聊天。</p></div><div class="coin" style="cursor:default"><i class="c"></i>${S.coins}</div></div>
+  <div class="box" style="margin-bottom:16px"><h3>每日签到<small>连续 7 天额外送 50 金币</small></h3>
+    <div class="week">${[1,2,3,4,5,6,7].map(d=>{const got = d<=S.checkedDays, today = d===S.checkedDays+(S.checkedToday?0:1);
+      return `<div class="day ${got?'got':''} ${today?'today':''}"><small>第 ${d} 天</small><b><i class="c" style="width:14px;height:14px"></i>${d===7?70:20}</b>${got?'<small style="color:var(--pink)">已领</small>':today?'<small>今天</small>':'<small>&nbsp;</small>'}</div>`}).join('')}</div>
+    <div class="formbar"><button class="btn pri" ${S.checkedToday?'disabled':''} onclick="checkIn()">${S.checkedToday?'今天已签到':'签到领 20 金币'}</button></div></div>
+  <div class="two">
+    <div class="box"><h3>新人任务<small>完成后手动领取</small></h3>
+      ${tasks.map(([t,d,p,goal,rw,k])=>{const done=p>=goal, got=S.claimed[k];
+        return `<div class="task"><div class="t"><b>${t}</b><span>${d} · ${p}/${goal}</span><div class="bar"><i style="width:${p/goal*100}%"></i></div></div>
+        <span class="reward"><i class="c" style="width:14px;height:14px"></i>${rw}</span>
+        <button class="btn sm ${done&&!got?'pri':''}" ${!done||got?'disabled':''} onclick="S.claimed['${k}']=1;addCoins(${rw},'任务奖励');renderPage()">${got?'已领取':done?'领取':'未完成'}</button></div>`}).join('')}
+    </div>
+    <div class="box"><h3>邀请好友<small>双方各得 50 金币</small></h3>
+      <p class="hint">朋友通过你的链接注册，并和任意角色聊满 10 轮后，你们各得 50 金币。每月最多邀请 10 人。</p>
+      <div class="field" style="margin-top:14px"><label>你的邀请链接</label><div class="addfact"><input readonly value="flower.app/i/${ME}"><button class="btn sm pri" onclick="share('flower.app/i/${ME}','邀请链接已复制')">复制</button></div></div>
+      <div class="task"><div class="t"><b>已邀请 0 人</b><span>朋友聊满 10 轮后到账</span></div></div>
+    </div>
+  </div>`;
+}
+function checkIn(){
+  if(S.checkedToday){ toast('今天已经签到过了，明天再来'); return; }
+  S.checkedToday = true; S.checkedDays++; addCoins(20,'签到成功'); renderShell(); if(route==='rewards') renderPage();
+}
+function addCoins(n, why){ S.coins += n; toast(`${why}，+${n} 金币`); renderShell(); paintCost(); }
+
+/* ================= 会员与金币 ================= */
+function pPlans(){
+  const packs = [[60,0.99,''],[330,4.99,'+10%'],[700,9.99,'+17%'],[1500,19.99,'+25%']];
+  return `<div class="ph"><div><h1>会员与金币</h1><p>每条回复按模型扣金币，余额一直显示在输入框下方。</p></div><div class="coin" style="cursor:default"><i class="c"></i>${S.coins}<span class="plan ${S.vip?'vip':''}">${S.vip?'会员':'免费版'}</span></div></div>
+  <div class="three" style="margin-bottom:24px">
+    <div class="box plancard"><h3>免费版</h3><div class="price">$0</div>
+      <ul><li><svg width="14" height="14"><use href="#i-check"/></svg>每日签到领金币</li><li><svg width="14" height="14"><use href="#i-check"/></svg>标准模型，每条 1 金币</li><li><svg width="14" height="14"><use href="#i-check"/></svg>单角色聊天、记忆查看</li></ul>
+      <button class="btn" disabled>${S.vip?'—':'当前方案'}</button></div>
+    <div class="box plancard hl"><span class="ribbon">首月 5 折</span><h3>月度会员</h3><div class="price">$4.99 <small>首月，之后 $9.99/月</small></div>
+      <ul><li><svg width="14" height="14"><use href="#i-check"/></svg>每天赠送 100 金币</li><li><svg width="14" height="14"><use href="#i-check"/></svg>高级模型、群聊、世界卡</li><li><svg width="14" height="14"><use href="#i-check"/></svg>记忆条数上限提高到 50 条</li><li><svg width="14" height="14"><use href="#i-check"/></svg>无广告、优先排队</li></ul>
+      <button class="btn pri" ${S.vip?'disabled':''} onclick="buy('vip')">${S.vip?'已开通':'开通会员'}</button></div>
+    <div class="box plancard"><h3>年度会员</h3><div class="price">$79.99 <small>/年，约 $6.67/月</small></div>
+      <ul><li><svg width="14" height="14"><use href="#i-check"/></svg>月度会员全部权益</li><li><svg width="14" height="14"><use href="#i-check"/></svg>开通即送 1000 金币</li></ul>
+      <button class="btn" ${S.vip?'disabled':''} onclick="buy('vip',1000)">${S.vip?'已开通':'开通年度会员'}</button></div>
+  </div>
+  <div class="box" style="margin-bottom:16px"><h3>购买金币<small>金币不会过期</small></h3>
+    <div class="packs">${packs.map(([c,p,b])=>`<button class="pack" onclick="buy('coin',${c},${p})"><small>${b?'多送 '+b:'&nbsp;'}</small><b><i class="c"></i>${c}</b><span>$${p}</span></button>`).join('')}</div></div>
+  <div class="box"><h3>每条消息花多少</h3>
+    <table class="cost"><tr><th>操作</th><th>标准模型</th><th>高级模型</th></tr>
+      <tr><td>发一条消息，角色回复</td><td>1 金币</td><td>3 金币</td></tr>
+      <tr><td>重新生成 / 续写</td><td>1 金币</td><td>3 金币</td></tr>
+      <tr><td>编辑回复、查看和修改记忆</td><td>免费</td><td>免费</td></tr></table></div>`;
+}
+function buy(kind, n, price){
+  const what = kind==='vip' ? (n?'年度会员':'月度会员') : `${n} 金币（$${price}）`;
+  openModal(`<div class="pad"><h2>确认购买</h2><p class="sub">${what}。演示版不会真的扣款。</p>
+    <div class="formbar"><button class="btn" onclick="closeModal()">取消</button><button class="btn pri" onclick="closeModal();doBuy('${kind}',${n||0})">确认支付</button></div></div>`);
+}
+function doBuy(kind,n){
+  if(kind==='vip'){ S.vip=true; addCoins(n||100, '会员已开通'); }
+  else addCoins(n,'购买成功');
+  renderPage();
+}
+
+/* ================= 通知 ================= */
+function pNotice(){
+  return `<div class="ph"><div><h1>通知</h1><p>签到提醒、角色更新和系统消息。</p></div><button class="btn" onclick="S.notices.forEach(n=>n.read=true);renderShell();renderPage()">全部标为已读</button></div>
+  <div class="box"><div class="rows">${S.notices.map((n,i)=>`
+    <div class="row" tabindex="0" onclick="readNotice(${i})">${n.read?'<span style="width:8px"></span>':'<span class="unread"></span>'}
+      ${n.role?`<span class="thumb round"><img class="art" src="${roleById(n.role).cover}" alt=""></span>`:`<span class="thumb round" style="display:grid;place-items:center;background:var(--raised)"><svg width="20" height="20" style="color:var(--pink)"><use href="#i-bell"/></svg></span>`}
+      <div class="t"><b style="${n.read?'color:var(--muted)':''}">${esc(n.t)}</b><span>${esc(n.x)}</span></div><div class="meta">${n.time}</div></div>`).join('')}</div></div>`;
+}
+function readNotice(i){
+  const n=S.notices[i]; n.read=true; renderShell();
+  if(n.role){ renderPage(); openDetail(n.role); } else if(n.go===route) renderPage(); else nav(n.go);
+}
+
+/* ================= 个人主页 ================= */
+function pMe(){
+  const favs = ROLES.filter(r=>S.favs.has(r.id)), mine = ROLES.filter(r=>r.by===ME);
+  const rounds = Object.values(S.sessions).reduce((a,s)=>a+s.rounds,0);
+  return `<div class="profile"><span class="avatar"></span><div><h1>${ME}</h1><p>${S.vip?'会员':'免费版'} · 金币 ${S.coins}</p></div>
+    <div class="nums"><div><b>${Object.keys(S.sessions).length}</b><span>聊过的角色</span></div><div><b>${rounds}</b><span>聊天轮数</span></div><div><b>${favs.length}</b><span>收藏</span></div><div><b>${mine.length}</b><span>创建</span></div></div></div>
+  <div class="two" style="margin-bottom:24px">
+    <div class="box"><h3>我的玩家人设<small>角色会按这里称呼你</small></h3>
+      <div class="field"><label>名字</label><input id="pName" value="${esc(S.persona.name)}"></div>
+      <div class="field"><label>希望角色怎么称呼你</label><input id="pCall" value="${esc(S.persona.call)}"></div>
+      <div class="field"><label>关于你<small>角色会知道这些</small></label><textarea id="pBio" rows="3">${esc(S.persona.bio)}</textarea></div>
+      <div class="formbar"><button class="btn pri" onclick="S.persona={name:pName.value.trim()||'mu',call:pCall.value.trim()||'你',bio:pBio.value.trim()};toast('人设已保存，下一条回复开始生效')">保存人设</button></div></div>
+    <div class="box"><h3>账户</h3>
+      <div class="task"><div class="t"><b>方案</b><span>${S.vip?'月度会员':'免费版'}</span></div><button class="btn sm" onclick="nav('plans')">${S.vip?'管理':'升级'}</button></div>
+      <div class="task"><div class="t"><b>金币余额</b><span>${S.coins} 金币</span></div><button class="btn sm" onclick="nav('plans')">充值</button></div>
+      <div class="task"><div class="t"><b>回复长度与内容偏好</b><span>回复${S.settings.len}${S.settings.suggest?' · 显示建议回复':''}</span></div><button class="btn sm" onclick="openSettings()">设置</button></div></div>
+  </div>
+  <h2 style="font-size:18px;margin-bottom:12px">收藏的角色</h2>
+  <div class="grid" style="margin-bottom:24px">${favs.length?favs.map(card).join(''):`<div class="empty"><strong>还没有收藏</strong><span>点角色卡右上角的星标收藏。</span></div>`}</div>
+  <h2 id="mine" style="font-size:18px;margin-bottom:12px">我创建的角色</h2>
+  <div class="grid">${mine.length?mine.map(card).join(''):`<div class="empty"><strong>还没有创建角色</strong><span>写一个名字和一句开场白，就能发布第一张卡。</span><button class="btn-create" onclick="nav('create')">创建角色</button></div>`}</div>`;
+}
+function openSettings(){
+  openModal(`<div class="pad"><h2>设置</h2><p class="sub">对所有角色生效。</p>
+    <div class="field"><label>回复长度</label><div class="seg">${['简短','适中','详细'].map(l=>`<button class="${S.settings.len===l?'cur':''}" onclick="S.settings.len='${l}';openSettings()">${l}</button>`).join('')}</div></div>
+    <div class="field"><label>聊天时显示建议回复</label><button class="toggle" style="width:max-content" onclick="S.settings.suggest=!S.settings.suggest;openSettings()">${S.settings.suggest?'开启':'关闭'}<span class="sw ${S.settings.suggest?'on':''}"></span></button></div>
+    <div class="field"><label>成人内容<small>需要完成年龄验证</small></label><button class="toggle" style="width:max-content" onclick="toast('演示版不开放成人内容')">关闭<span class="sw"></span></button></div>
+    <div class="formbar"><button class="btn pri" onclick="closeModal();toast('设置已保存')">完成</button></div></div>`);
+}
+
+/* ================= 创建角色 ================= */
+const draft = {name:'',desc:'',tags:'',personality:'',world:'',relationship:'',greeting:'',cover:ROLES[0].cover,kind:'单人卡'};
+function pCreate(){
+  const covers = [...new Set(ROLES.map(r=>r.cover))].slice(0,12);
+  const f = (k,label,hint,rows,ph) => `<div class="field"><label for="d_${k}">${label}${hint?`<small>${hint}</small>`:''}</label>${rows
+    ?`<textarea id="d_${k}" rows="${rows}" placeholder="${ph}" oninput="draft.${k}=this.value;paintCreatePreview()">${esc(draft[k])}</textarea>`
+    :`<input id="d_${k}" placeholder="${ph}" value="${esc(draft[k])}" oninput="draft.${k}=this.value;paintCreatePreview()">`}<span class="err" id="e_${k}"></span></div>`;
+  return `<div class="ph"><div><h1>创建角色</h1><p>名字和开场白必填，其余可以之后再补。</p></div>
+    <button class="btn" onclick="aiDraft()"><svg width="16" height="16"><use href="#i-spark"/></svg>AI 帮我起草</button></div>
+  <div class="create"><div class="box">
+    <div class="field"><label>形象</label><div class="covers">${covers.map(c=>`<button class="${draft.cover===c?'cur':''}" aria-label="选择形象" onclick="draft.cover='${c}';renderPage()"><img class="art" src="${c}" alt=""></button>`).join('')}</div></div>
+    <div class="field"><label>类型</label><div class="seg">${['单人卡','多人卡','模拟器'].map(k=>`<button class="${draft.kind===k?'cur':''}" onclick="draft.kind='${k}';renderPage()">${k}</button>`).join('')}</div></div>
+    ${f('name','名字','',0,'比如：沈听澜')}
+    ${f('desc','一句话简介','显示在角色卡上',0,'比如：旧书修复店的店主，为你留了一本空白的书')}
+    ${f('tags','标签','用空格分开',0,'比如：治愈 慢热 近代现代')}
+    ${f('world','故事背景','',2,'故事发生在哪里，现在是什么情况')}
+    ${f('relationship','你们的关系','',0,'比如：常来店里的熟客')}
+    ${f('personality','性格与说话方式','',3,'他平时怎么说话？遇到冲突会怎么做？')}
+    ${f('greeting','开场白','角色的第一句话，括号里写动作',3,'（他从书架顶层抽出一本空白笔记。）这本不卖。')}
+    <div class="formbar"><button class="btn" onclick="toast('草稿已保存')">保存草稿</button><button class="btn pri" onclick="publish()">发布并开始聊天</button></div>
+  </div>
+  <div class="preview"><p class="hint" style="margin-bottom:8px">角色卡预览</p><div id="cprev"></div></div></div>`;
+}
+function draftRole(){ return {id:'mine-'+Date.now(),name:draft.name||'未命名角色',by:ME,official:false,tags:draft.tags.split(/\s+/).filter(Boolean),desc:draft.desc,chats:'',stars:'',cover:draft.cover,category:draft.kind,kinds:draft.kind==='多人卡'?['群聊']:draft.kind==='模拟器'?['世界','目标']:[],story:'',personality:draft.personality||'—',world:draft.world||draft.desc||'—',relationship:draft.relationship||'刚认识',greeting:draft.greeting,playMode:draft.kind==='模拟器'?'剧情探索':'自由聊天'}; }
+function paintCreatePreview(){ const el=document.getElementById('cprev'); if(el) el.innerHTML = card(draftRole()).replace(/onclick="[^"]*"/g,'').replace('tabindex="0"',''); }
+function aiDraft(){
+  const n = draft.name.trim() || '温以宁';
+  Object.assign(draft,{name:n,desc:draft.desc||`深夜便利店的店员，总记得你买过什么。`,tags:draft.tags||'治愈 慢热 近代现代',world:draft.world||'城市边缘的 24 小时便利店，凌晨两点只有你一位客人。',relationship:draft.relationship||'常来买东西的熟客',personality:draft.personality||'话不多但很细心，会用小事表达关心；不会替对方做决定。',greeting:draft.greeting||`（${n}把一杯热牛奶推到收银台边。）又是这个点？今天的关东煮还剩最后一串萝卜，给你留着。`});
+  renderPage(); toast('已起草，接入模型后会按你写的名字和标签生成');
+}
+function publish(){
+  let ok = true;
+  [['name','写一个名字'],['greeting','写一句开场白，角色会先开口']].forEach(([k,m])=>{ const e=document.getElementById('e_'+k); e.textContent = draft[k].trim()?'':m; if(!draft[k].trim()) ok=false; });
+  if(!ok){ toast('还差必填项'); return; }
+  const r = draftRole(); ROLES.unshift(r);
+  Object.keys(draft).forEach(k=>{ if(!['cover','kind'].includes(k)) draft[k]=''; });
+  toast('已发布'); nav('chat', r.id);
+}
+
+/* ================= 弹窗 / 提示 ================= */
+function openModal(html, wide){ const m=document.getElementById('modal'); m.className='modal'+(wide?' wide':''); m.style.width = wide?'min(760px,100%)':''; m.innerHTML = `<button class="x" aria-label="关闭" onclick="closeModal()"><svg width="18" height="18"><use href="#i-x"/></svg></button>`+html; document.getElementById('scrim').classList.add('on'); }
+function closeModal(){ document.getElementById('scrim').classList.remove('on'); }
+addEventListener('keydown', e=>{ if(e.key==='Escape'){ closePreview(); closeModal(); closeMenu(); closeDrawer(); } });
+let toastT;
+function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'),2200); }
+function share(text, msg){ const t = text || location.href; (navigator.clipboard?.writeText(t)||Promise.reject()).catch(()=>{}); toast(msg||'分享链接已复制'); }
+
+/* ================= 聊天 ================= */
+/* 消息结构：{who:'ai', versions:[[{t:'n'|'s', x}]], v} 或 {who:'me', text} */
+function parseGreeting(g){
+  const parts = g.split(/(（[^）]*）)/).filter(s=>s.trim());
+  return parts.map(s=> s.startsWith('（') ? {t:'n',x:s.slice(1,-1).replace(/，$/,'。')} : {t:'s',x:'“'+s.trim()+'”'});
+}
+function session(id){
+  const r = roleById(id);
+  return S.sessions[id] ||= {msgs:[{who:'ai',versions:[[{t:'n',x:r.world+(r.appearance?r.appearance:'')}, ...parseGreeting(r.greeting)]],v:0}], facts:[], rounds:0, updated:Date.now()};
+}
+function showChat(id){
+  route='chat'; cur = id; const r = roleById(id); session(id);
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('chat').classList.add('on');
+  document.getElementById('stageArt').innerHTML = `<img class="art" src="${r.cover}" alt="${esc(r.name)}">`;
+  document.getElementById('blurArt').innerHTML = `<img class="art" src="${r.cover}" alt="">`;
+  document.getElementById('roomTitle').textContent = r.name;
+  closeDrawer(); paintModel(); paintChatFav(); renderFeed(); renderSuggest(); paintCost();
+  document.getElementById('msgInput').focus({preventScroll:true});
+}
+function paintChatFav(){ const b=document.getElementById('chatFav'), on=S.favs.has(cur); b.classList.toggle('on',on); b.setAttribute('aria-label',on?'取消收藏':'收藏'); }
+function paintModel(){ document.getElementById('modelBtn').innerHTML = `<svg width="18" height="18"><use href="#i-cpu"/></svg>${MODELS[S.model].name}<svg width="14" height="14"><use href="#i-down"/></svg>`; }
+function paintCost(){ const el=document.getElementById('costline'); if(el) el.innerHTML = `${MODELS[S.model].name} · 每条 ${MODELS[S.model].cost} 金币 · 余额 <i class="c"></i><b>${S.coins}</b>`; }
+function modelMenu(a){ openMenu(a, Object.entries(MODELS).map(([k,m])=>`<button class="${S.model===k?'cur':''}" onclick="closeMenu();S.model='${k}';paintModel();paintCost();toast('已切换到${m.name}，每条 ${m.cost} 金币')"><span><b>${m.name}</b><br><span style="color:var(--muted);font-size:12px">${m.tip}</span></span><span class="r">${m.cost} 金币/条</span></button>`).join('')); }
+function chatMenu(a){
+  const clear = document.getElementById('room').classList.contains('clear');
+  openMenu(a, mi('角色详情',`openDetail(cur)`)+mi('我的玩家人设',`nav('me')`)+mi(clear?'背景：模糊':'背景：清晰',`document.getElementById('room').classList.toggle('clear')`)+mi('重新开始这段故事',`restart()`)+'<hr>'+mi('举报这个角色',`toast('已收到举报，我们会在 24 小时内处理')`));
+}
+function plusMenu(a){ openMenu(a, mi('写一条记忆',`openDrawer();setTimeout(()=>document.getElementById('factIn')?.focus(),260)`)+mi('续写角色上一条',`act('cont')`)+mi('发送图片',`toast('图片玩法会在后续版本开放')`)); }
+function restart(){ openModal(`<div class="pad"><h2>重新开始这段故事？</h2><p class="sub">聊天记录会清空，记下的事实会保留。</p><div class="formbar"><button class="btn" onclick="closeModal()">取消</button><button class="btn pri" onclick="closeModal();restartActive();toast('已重新开始')">重新开始</button></div></div>`); }
+
+function restartActive(){
+  const daily=session(cur);
+  if(daily.trip){const trip=daily.trip; trip.msgs=[{who:'scene',text:trip.world[2]}];trip.rounds=0;}
+  else {const facts=daily.facts;delete S.sessions[cur];session(cur).facts=facts;}
+  showChat(cur);
+}
+function msgHTML(m, i, last){
+  const r = roleById(cur);
+  if(m.who==='scene') return `<div class="msg"><div class="txt"><p>${esc(m.text)}</p></div>${(m.rewards||[]).map(rewardCard).join('')}</div>`;
+  if(m.who==='me') return `<div class="mine">${esc(m.text)}</div>`;
+  const paras = m.versions[m.v].map(p=>`<p class="${p.t==='s'?'say':''}">${esc(p.x)}</p>`).join('');
+  return `<div class="msg" data-i="${i}">
+    <div class="who"><span class="mini"><img class="art" src="${r.cover}" alt=""></span>${esc(short(r.name))}</div>
+    <div class="txt" id="txt${i}">${paras}</div>
+    ${reasonLine(m.change,true)}<div class="acts">
+      ${last?`<button onclick="act('redo')"><svg width="14" height="14"><use href="#i-redo"/></svg>重新生成</button>`:''}
+      <button onclick="editMsg(${i},this)"><svg width="14" height="14"><use href="#i-edit"/></svg>编辑</button>
+      ${last?`<button onclick="act('cont')"><svg width="14" height="14"><use href="#i-cont"/></svg>续写</button>`:''}
+      ${m.versions.length>1?`<span class="pager"><button aria-label="上一版" ${m.v===0?'disabled':''} onclick="page(${i},-1)"><svg width="14" height="14"><use href="#i-left"/></svg></button>${m.v+1} / ${m.versions.length}<button aria-label="下一版" ${m.v===m.versions.length-1?'disabled':''} onclick="page(${i},1)"><svg width="14" height="14"><use href="#i-right"/></svg></button></span>`:''}
+    </div>${(m.rewards||[]).map(rewardCard).join('')}</div>`;
+}
+function renderFeed(){
+  const r = roleById(cur), s = activeChat();
+  const lastAi = s.msgs.map(m=>m.who).lastIndexOf('ai');
+  document.getElementById('feed').innerHTML = `
+    ${s.world?'':`<div class="brief"><h4><svg width="18" height="18"><use href="#i-book"/></svg>${r.story?esc(r.story):'故事简介'}</h4>
+      <p>${esc(blurb(r))}</p><p class="rel">你们的关系：${esc(r.relationship)}</p></div>`}
+    ${s.msgs.map((m,i)=>msgHTML(m,i,i===lastAi && !busy)).join('')}`;
+  paintPlay();
+  const w = document.getElementById('feedWrap'); w.scrollTop = w.scrollHeight;
+}
+function page(i,d){ const m=activeChat().msgs[i]; m.v=Math.max(0,Math.min(m.versions.length-1,m.v+d)); renderFeed(); }
+function editMsg(i, btn){
+  const el = document.getElementById('txt'+i), m = activeChat().msgs[i];
+  if(el.isContentEditable){
+    m.versions[m.v] = [...el.querySelectorAll('p')].map(p=>({t:p.classList.contains('say')?'s':'n',x:p.innerText.trim()})).filter(p=>p.x);
+    renderFeed(); toast('已保存修改，下一条回复会按改过的内容接着演');
+  } else {
+    el.contentEditable = 'true'; el.focus();
+    btn.innerHTML = `<svg width="14" height="14"><use href="#i-check"/></svg>保存`;
+  }
+}
+
+/* 演示回复：未接模型，按角色名和玩家原话拼出旁白 + 台词 */
+const NARR = ['{n}听完，停顿了一下。','{n}把手里的东西放下，认真看着{u}。','{n}轻轻笑了一声，移开视线又看回来。','{n}没有马上回答，指尖在桌沿敲了两下。','{n}往{u}这边走近了半步。'];
+const SAY  = ['“你这么说，我倒是有点意外。再多说一点？”','“好，我记住了。接下来你想怎么做？”','“再说一遍——我想确认我没听错。”','“那就按你说的来。不过，你得陪我把这件事做完。”','“……你总是这样，让人没办法拒绝。”','“先别急着走。外面还在下雨。”'];
+const CONT = ['{n}像是想起了什么，又补了一句。','沉默了一会儿，{n}的语气软了下来。'];
+const SUG  = ['（愣了一下）你在等我？','好，我听你说。不过你得先告诉我为什么。','（没有回答，只是看着对方）','我今天有点累，能陪我坐一会儿吗？','你还记得我上次说的那件事吗？','（笑了笑）你今天好像心情不错。','先说好，这次换我来决定。','如果我说不呢？'];
+const pickN = (arr,k) => [...arr].sort(()=>Math.random()-.5).slice(0,k);
+const fill = (t,r) => t.replaceAll('{n}',short(r.name)).replaceAll('{u}',S.persona.call||'你');
+function mockReply(r, userText, mode){
+  if(mode==='cont') return [{t:'n',x:fill(pickN(CONT,1)[0],r)},{t:'s',x:pickN(SAY,1)[0]}];
+  const lockHint = activeChat().facts.find(f=>f.lock && userText && userText.includes(f.x.slice(0,2)));
+  return [{t:'n',x:fill(pickN(NARR,1)[0],r)},{t:'s',x: lockHint ? `“我记得——${lockHint.x}。这件事不会变。”` : pickN(SAY,1)[0]}];
+}
+function renderSuggest(refresh){
+  const el = document.getElementById('suggest');
+  if(!S.settings.suggest){ el.innerHTML=''; return; }
+  el.innerHTML = pickN(SUG,3).map(t=>`<button class="glass" onclick="msgInput.value=this.textContent;msgInput.focus()">${esc(t)}</button>`).join('');
+  if(refresh) toast('换了一批建议回复');
+}
+let busy = false;
+function charge(){
+  const c = MODELS[S.model].cost;
+  if(S.coins < c){
+    openModal(`<div class="pad"><h2>金币不够了</h2><p class="sub">${MODELS[S.model].name}每条 ${c} 金币，你还剩 ${S.coins}。</p>
+      <div class="formbar">${S.model==='pro'?`<button class="btn" onclick="closeModal();S.model='std';paintModel();paintCost()">换标准模型（1 金币/条）</button>`:''}${!S.checkedToday?`<button class="btn" onclick="closeModal();checkIn()">签到领 20</button>`:''}<button class="btn pri" onclick="closeModal();nav('plans')">去充值</button></div></div>`);
+    return false;
+  }
+  S.coins -= c; renderShell(); paintCost(); return true;
+}
+function send(){
+  if(busy) return;
+  const inp = document.getElementById('msgInput'), text = inp.value.trim();
+  if(!text){ inp.focus(); toast('先写点什么，或点上面的建议回复'); return; }
+  if(!charge()) return;
+  const s = activeChat(); s.msgs.push({who:'me',text}); s.rounds++; s.updated=Date.now(); inp.value='';
+  const m = {who:'ai',versions:[[]],v:0}; s.msgs.push(m);
+  stream(m, mockReply(roleById(cur), text));
+  renderSuggest();
+}
+function act(kind){
+  if(busy) return;
+  const s = activeChat(), i = s.msgs.map(m=>m.who).lastIndexOf('ai'), m = s.msgs[i];
+  if(!m) return;
+  if(!charge()) return;
+  if(kind==='redo'){ m.versions.push([]); m.v = m.versions.length-1; stream(m, mockReply(roleById(cur), lastUser(s))); }
+  else { const base = m.versions[m.v]; const add = mockReply(roleById(cur),'', 'cont'); m.versions[m.v] = base; stream(m, add, base.length); }
+  s.updated = Date.now();
+}
+const lastUser = s => [...s.msgs].reverse().find(m=>m.who==='me')?.text || '';
+function stream(m, paras, keep=0){
+  busy = true; document.getElementById('sendBtn').disabled = true;
+  const target = m.versions[m.v]; target.length = keep;
+  let pi = 0, ci = 0;
+  const tick = () => {
+    if(pi >= paras.length){ busy=false; document.getElementById('sendBtn').disabled=false; renderFeed(); return; }
+    if(!target[keep+pi]) target[keep+pi] = {t:paras[pi].t, x:''};
+    const step = reduced ? 999 : 2;
+    target[keep+pi].x = paras[pi].x.slice(0, ci += step);
+    if(ci >= paras[pi].x.length){ pi++; ci=0; }
+    renderFeed();
+    const ms = document.querySelectorAll('.msg'), lastP = ms[ms.length-1]?.querySelector('.txt p:last-child'); if(lastP && busy) lastP.classList.add('caret');
+    setTimeout(tick, reduced ? 0 : 28);
+  };
+  setTimeout(tick, reduced ? 0 : 450);
+}
+
+/* 记忆抽屉：剧情摘要 + 事实表（可锁定为“玩家确认，角色不可推翻”） */
+function openDrawer(){ closeDrawer(); paintDrawer(); document.getElementById('drawer').classList.add('on'); document.getElementById('room').scrollLeft = 0; }
+function closeDrawer(){ playEl('relationDrawer').inert=true; playEl('relationDrawer').classList.remove('on'); document.getElementById('drawer')?.classList.remove('on'); }
+function paintDrawer(){
+  const r = roleById(cur), s = activeChat();
+  document.getElementById('drawerIn').innerHTML = `
+    <div><h4>剧情摘要<small>每 5 轮自动更新</small></h4><div class="sum">${esc(summary(r,s))}</div></div>
+    <div><h4>每轮必读的事实<small>${s.facts.length} / ${S.vip?50:20} 条</small></h4>
+      ${s.facts.map((f,i)=>`<div class="fact ${f.lock?'locked':''}"><span>${esc(f.x)}</span>
+        <button class="lock ${f.lock?'on':''}" aria-label="${f.lock?'取消锁定':'锁定'}" title="锁定后角色不能推翻" onclick="activeChat().facts[${i}].lock=!activeChat().facts[${i}].lock;paintDrawer()"><svg width="16" height="16"><use href="#i-lock"/></svg></button>
+        <button aria-label="删除" onclick="activeChat().facts.splice(${i},1);paintDrawer()"><svg width="16" height="16"><use href="#i-trash"/></svg></button></div>`).join('') || '<p class="hint" style="margin-bottom:8px">还没有事实。写下你希望他一直记得的事，比如“我只喝燕麦奶拿铁”。</p>'}
+      <form class="addfact" onsubmit="event.preventDefault();addFact()"><input id="factIn" placeholder="添加一条事实" maxlength="60"><button class="btn sm pri">添加</button></form>
+      <p class="hint" style="margin-top:8px">锁定的事实是你确认过的，角色为了制造剧情也不能推翻。</p></div>
+    <div><h4>角色设定<small>来自角色卡，只读</small></h4><p class="hint">${esc(r.personality)}</p></div>`;
+}
+function addFact(){
+  const i = document.getElementById('factIn'), x = i.value.trim(); if(!x){ i.focus(); return; }
+  const s = activeChat(); if(s.facts.length >= (S.vip?50:20)){ toast('事实已满，开通会员可记 50 条'); return; }
+  s.facts.push({x,lock:true}); paintDrawer(); toast('已记下并锁定'); setTimeout(()=>document.getElementById('factIn').focus(),0);
+}
+
+// 仅用于界面演示。正式阶段线待判分实验后确定。
+const STAGE_LINES = [0, 25, 55, 85];
+const PLAY_DEMO = {
+  stages:['初识','朋友','心动','恋人'],
+  note:'原型 v3.2 · 聊天、独白与日志均为预置演示 · 仅本次打开有效',
+  controls:['说对了','说错了','到下一阶段','直接成为恋人','重置'],
+  modes:[['保留关系','他还是你的恋人，记得你们的事。'],['重新认识','在这个世界里从初识开始。原来的关系留着，随时能切回。']],
+  worlds:[
+    ['海边小镇的夏天','住进旧邮局楼上的小房间，一起度过海风很慢的夏天。','你们刚到海边邮局，门口晾着一排明信片；挑一张吧，今天的邮船还没开。'],
+    ['雾都的侦探事务所','推开黄铜门牌下的小门，一起接街坊的小委托。','你们走进蒸汽钟旁的事务所，窗台上坐着一只花猫，项圈里塞着半张取衣单。'],
+    ['雪山温泉旅馆','在积雪封路的小旅馆借宿，等一场晴天。','你们踩着新雪到了旅馆，老板递来一盏灯，请你们替露天汤池挂上今晚的木牌。']
+  ],
+  campus:{
+    up:['你把我改过的那页留下了。','我话没讲完，你等我了。','你还记得我走哪扇校门。','你先问了我想不想上台。','你给我留了靠走廊的座。'],
+    down:['我还没答应，你就替我报名了。','你把我的草稿发到群里了。','我说真的，你却拿我打趣。','你当众念了我写给你的话。','我想自己把那句讲完。'],
+    voices:[
+      '你问我干吗每次都走这扇门。这回告诉你吧，近路在另一头，这边有人肯听我讲完。活动单上还有一排空格，下次散场想吃什么，你来写，我负责认路。',
+      '刚才台下那么多人，我偏偏一眼就看见你。原先准备的开场白一下忘了，好在你举了举那张皱巴巴的活动单。我忽然觉得，就算讲砸了，也想第一个下来找你。',
+      '今天散场以后，能不能再陪我走一次远路？有句话排练多少遍都不像我自己说的。算了，我直接讲。我喜欢你。下次有人问我在等谁，我想大大方方说，是我女朋友。'
+    ],
+    moments:[
+      ['社团教室熄了大半的灯，尹载俊蹲在最后一排捡掉了一地的活动单。她帮他按页码理好，发现背面还有铅笔写的小字，就把那张放回了最上面。他拉好背包才想起问她走哪扇门，两个人从同一级台阶迈了出去。','他','你也打算走这边？行，一起走。'],
+      ['第二次散场时，她在门边多站了一会儿。他正低着头把讲错的那一句重新写在纸上，旁边的人早就走光了。她没有催，只把走廊快熄的灯重新按亮。等他终于抬起头，两个人并排下楼，顺路分了一袋还热的栗子。','她','这盏灯我来按，你慢慢写。'],
+      ['轮到他上台的那天，投影偏偏停在空白页。他捏着话筒，看见她坐在靠走廊的位置，手里举着第一次散场捡到的那张纸。台下有人轻轻笑了一声，他也笑了。后来他说，开场那几秒，他其实只看得清她一个人。','他','那张纸你还留着啊。'],
+      ['最后一次排练收得很早，校门口卖栗子的小摊还没出摊。他把折了许多道的活动单摊在长椅上，背面只写了一句喜欢她。她读完，借走他夹在口袋里的笔，在那行字下画了一个勾。他们又沿着远路慢慢走了一圈。','她','下次散场，还是我来等你。']
+    ],
+    ending:'近路在那边。今天也陪我绕一圈吧？'
+  },
+  common:{
+    up:['我话没讲完，你等我了。','你记得我喜欢靠窗坐。','你把我的便条收好了。','你先问了我的意思。','我随口说的歌，你找到了。'],
+    down:['我还没答应，你就替我决定了。','你把我的便条给别人看了。','我还没说完，你就走了。','你拿我的心事开玩笑了。','你翻开了我合上的本子。'],
+    voices:[
+      '上次你说要给我听的那首歌，我一直记着呢。今天刚好多带了一副耳机，要不要坐一会儿？我把靠窗的位置给你留着了，你听完再告诉我，最喜欢的是哪一句。',
+      '昨天路过那扇窗，我居然停下来往里看了一眼。明明知道你那天不会来，还是忍不住想看看。下回如果我又先到了，你可以慢慢走，我挺喜欢等你推门的那一刻。',
+      '有些话写在纸上容易，当面说却要鼓起好大的勇气。我想和你在一起，想跟你一起过平常的日子。今天这句话我当面说给你听，等你愿意，再把你的那句告诉我。'
+    ],
+    moments:[
+      ['两个人第一次安安静静坐下来，是在一扇开着的窗旁边。桌上有一张被风吹起一角的便条，她伸手按住，等对方说完才把纸递回去。他们聊到窗外的脚步声渐渐稀了，临走时，她回头看了一眼刚才坐过的位置。','她','没关系，你慢慢讲。'],
+      ['再碰面的那天，两把椅子已经挪在了一起。她带来了上次提起的歌，把耳机递过去一只。前奏很长，谁也没急着说话。等到最后一段唱完，他们几乎同时伸手去按重播，又都收回了手，笑着让对方先来。','他','这一段，再陪我听一遍？'],
+      ['后来有一天她来得晚了些，窗边的灯还亮着，桌上多了一张折起的便条。她打开，里面画着两个歪歪扭扭的耳机。两个人谁也没提起等了多久，只把椅子又挪近了些，肩膀轻轻碰在一起，也没有立刻分开。','她','画得挺像，我能留下吗？'],
+      ['相约见面的那天下着小雨，窗玻璃上蒙着薄薄一层雾。她拿出一直收着的便条，边角已经有些旧了。对面的人看了很久，终于把藏在心里的那句话讲完。她把手放到桌子中间，两只手在那张便条旁边轻轻握在了一起。','他','我想和你在一起。']
+    ],
+    ending:'把你那边的耳机给我。我们再听一首。'
+  }
+};
+const playEl = id => document.getElementById(id);
+const playCopy = () => cur==='source-1' ? PLAY_DEMO.campus : PLAY_DEMO.common;
+const stageOf = value => STAGE_LINES.filter(line=>value>=line).length-1;
+const activeChat = () => session(cur).trip || session(cur);
+function relation(){
+  return activeChat().relation ||= {value:0, history:[], pictures:[], up:0, down:0, dismissed:false};
+}
+function playStage(n){return '你们成了「'+PLAY_DEMO.stages[n]+'」';}
+function rewardCard(n){
+  return `<section class="rewardcard"><img src="${roleById(cur).cover}" alt=""><div><b>${playStage(n)}</b><p>他有话想对你说</p></div><button class="btn pri" onclick="openReward(${n})">查看</button></section>`;
+}
+function moveRelation(action){
+  const chat=activeChat(), state=relation(), old=stageOf(state.value);
+  const reply=chat.msgs.filter(m=>m.who==='ai').at(-1);
+  if(action===4){
+    delete session(cur).trip;
+    delete session(cur).relation;
+    for(const m of session(cur).msgs){ delete m.change; delete m.rewards; }
+    closeDrawer(); renderFeed(); return;
+  }
+  const values=[state.value+8,state.value-8,STAGE_LINES[Math.min(3,old+1)],85];
+  const value=Math.min(100,Math.max(0,values[action]));
+  if(action<2 && !reply) return;
+  if(value===state.value){
+    if(reply) delete reply.change;
+    renderFeed(); return;
+  }
+  const stage=stageOf(value), dir=value>state.value?'up':'down';
+  state.value=value;
+  const reasons=playCopy()[dir];
+  const change={dir, reason:reasons[state[dir]++ % reasons.length], back:stage<old?stage:null};
+  state.history.unshift(change); state.history.length=Math.min(5,state.history.length);
+  if(reply) reply.change=change;
+  if(stage>old){
+    for(let i=old+1;i<=stage;i++) if(!state.pictures.includes(i)) state.pictures.push(i);
+    const anchor=reply || chat.msgs.at(-1);
+    (anchor.rewards ||= []).push(stage);
+    state.dismissed=false;
+  }
+  renderFeed();
+}
+function reasonLine(change,withBack=false){
+  if(!change)return '';
+  return `<div class="change ${change.dir}"><span aria-label="${change.dir==='up'?'升温':'降温'}">${change.dir==='up'?'↑':'↓'}</span>${change.reason}</div>`+
+    (withBack && change.back!==null?`<p class="hint">你们回到了「${PLAY_DEMO.stages[change.back]}」。还能聊回来。</p>`:'');
+}
+function paintPlay(){
+  const chat=activeChat(), state=relation(), stage=stageOf(state.value);
+  playEl('stageName').textContent=PLAY_DEMO.stages[stage];
+  playEl('stageFill').style.width=(stage===3?100:(state.value-STAGE_LINES[stage])*100/(STAGE_LINES[stage+1]-STAGE_LINES[stage]))+'%';
+  const canRate=chat.msgs.some(m=>m.who==='ai');
+  [...playEl('demoActions').children].forEach((btn,i)=>btn.disabled=(i<2&&!canRate)||(i>=2&&i<=3&&stage===3));
+  playEl('invite').hidden=stage!==3 || state.dismissed || !!chat.world;
+  const bar=playEl('worldbar'); bar.hidden=!chat.world;
+  if(chat.world) bar.firstElementChild.textContent='世界：'+chat.world[0]+' · 关系：'+(chat.fresh?'重新认识':'保留');
+  if(playEl('relationDrawer').classList.contains('on')) drawRelation();
+}
+function drawRelation(){
+  const state=relation(), stage=stageOf(state.value);
+  playEl('relationIn').innerHTML=`<section><h4>阶段</h4><div class="steps">${PLAY_DEMO.stages.map((s,i)=>`<span class="${i<=stage?'reached':''}" ${i===stage?'aria-current="step"':''}>${s}</span>`).join('')}</div>
+  <div class="portraits">${state.pictures.map(n=>`<button aria-label="重看${PLAY_DEMO.stages[n]}立绘" onclick="openReward(${n})"><img src="${roleById(cur).cover}" alt=""><small>${PLAY_DEMO.stages[n]}</small></button>`).join('')}</div></section>
+  <section><h4>最近的变化</h4>${state.history.map(c=>reasonLine(c)).join('')||'<p class="hint">还没有变化。聊聊看他在意什么。</p>'}</section>
+  <section><h4>在一起之后</h4>${stage===3?`<div class="playrow"><button class="btn" onclick="nav('journal',cur)">回顾日志</button><button class="btn" onclick="openWorlds()">去一个世界</button></div>`:'<p class="hint">成为恋人后，可以读回顾日志，也可以一起去新世界。</p>'}</section>`;
+}
+function openRelation(){closeDrawer(); drawRelation(); playEl('relationDrawer').inert=false; playEl('relationDrawer').classList.add('on');}
+function openReward(n){
+  const journal=n===3 && stageOf(relation().value)===3;
+  openModal(`<img class="rewardArt" src="${roleById(cur).cover}" alt="${PLAY_DEMO.stages[n]}阶段立绘"><div class="pad msg"><h2>${playStage(n)}</h2><div class="txt"><p class="say">${playCopy().voices[n-1]}</p></div><p class="hint">演示：正式版为新立绘</p><div class="formbar"><button class="btn" onclick="toast('已保存到相册')">保存立绘</button><button class="btn pri" onclick="closeModal();${journal?"nav('journal',cur)":''}">${journal?'读我们的回顾':'继续聊'}</button></div></div>`);
+  playEl('modal').style.width='min(100%, 420px, 62vh)';
+}
+let worldsBack='chat';
+function openWorlds(){worldsBack=route==='journal'?'journal':'chat';nav('worlds',cur);}
+function journalHTML(r){
+  const copy=playCopy();
+  return `<img class="journalCover" src="${r.cover}" alt="${esc(r.name)}"><h1>从初识到恋人</h1><p class="sub">和 ${esc(short(r.name))} · 相识第 12 天 · 聊了 86 轮</p>
+  ${copy.moments.map(([body,who,quote],i)=>`<article class="moment msg"><span class="pill">${PLAY_DEMO.stages[i]}</span><p class="narration">${body}</p><div class="txt">${who==='她'?`<div class="mine">“${quote}”</div>`:`<p class="say">“${quote}”</p>`}</div><button class="textlink" onclick="toast('正式版会跳回聊天里的这一句')">回到这句话</button></article>`).join('')}
+  <footer class="msg"><div class="txt"><p class="say">“${copy.ending}”</p></div><button class="btn pri" onclick="openWorlds()">和他去一个新世界</button><div class="playrow"><button class="textlink" onclick="toast('已保存')">保存日志</button><button class="textlink" onclick="nav('chat',cur)">先不去，继续聊天</button></div></footer>`;
+}
+function worldsHTML(){
+  return `<h1>带他去一个世界</h1><p class="sub">他还是他。换个地方，继续你们的故事。</p><div class="worldgrid">${PLAY_DEMO.worlds.map(([name,desc,opening],i)=>`<button class="worldcard" onclick="chooseWorld(${i})"><b>${name}</b><div><p>${desc}</p><small>开局</small><span>${opening}</span></div></button>`).join('')}</div>`;
+}
+function showPlayPage(page,id){
+  cur=id;
+  if(stageOf(relation().value)!==3){location.replace('#/chat/'+encodeURIComponent(id));return;}
+  route=page; closeDrawer(); playEl('app').classList.remove('on'); playEl('chat').classList.remove('on');
+  const el=playEl('playPage'); el.hidden=false;
+  el.innerHTML=`<button class="round glass back" aria-label="返回" onclick="nav('${page==='worlds'?worldsBack:'chat'}',cur)"><svg width="20" height="20"><use href="#i-back"/></svg></button><main class="${page}">${page==='journal'?journalHTML(roleById(id)):worldsHTML()}</main>`;
+  scrollTo(0,0);
+}
+function chooseWorld(i){
+  const [name,desc,opening]=PLAY_DEMO.worlds[i];
+  openModal(`<form class="pad" onsubmit="event.preventDefault();enterWorld(${i},this.elements.mode.value==='1')"><h2>${name}</h2><p class="sub">${desc}</p><h4>开局</h4><p class="opening">${opening}</p>${PLAY_DEMO.modes.map(([title,body],j)=>`<label class="modeChoice"><input type="radio" name="mode" value="${j}" ${j===0?'checked':''}><span><b>${title}</b><small>${body}</small></span></label>`).join('')}<div class="formbar"><button class="btn pri">进入世界</button></div></form>`);
+}
+function enterWorld(i,fresh){
+  const daily=session(cur), world=PLAY_DEMO.worlds[i], origin=activeChat();
+  daily.trip={world,fresh,rounds:0,updated:Date.now(),facts:fresh?[]:structuredClone(origin.facts),msgs:[{who:'scene',text:world[2]}]};
+  if(!fresh){ daily.trip.relation=structuredClone(origin.relation); daily.trip.relation.value=85; }
+  closeModal(); nav('chat',cur);
+}
+function leaveWorld(){delete session(cur).trip; showChat(cur);}
+
+playEl('note').textContent=PLAY_DEMO.note;
+playEl('demoBox').open=innerWidth>900;
+playEl('demoActions').innerHTML=PLAY_DEMO.controls.map((label,i)=>`<button class="btn" onclick="moveRelation(${i})">${label}</button>`).join('');
+/* ================= 启动 ================= */
+onRoute();
+</script>
+</body>
+</html>
